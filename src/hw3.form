@@ -32,15 +32,33 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <grid id="ae165" binding="genrePanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints/>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+            </children>
           </scrollpane>
           <scrollpane id="81dc1" binding="CountryScrollPanel">
             <constraints>
               <grid row="2" column="1" row-span="4" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <horizontalScrollBarPolicy value="30"/>
+            </properties>
             <border type="none"/>
-            <children/>
+            <children>
+              <grid id="95502" binding="countryPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                <margin top="0" left="0" bottom="0" right="0"/>
+                <constraints/>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </grid>
+            </children>
           </scrollpane>
           <grid id="2f860" binding="castPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
@@ -58,7 +76,16 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <scrollpane id="da8ec" binding="tagScrollPanel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children/>
+              </scrollpane>
+            </children>
           </grid>
           <grid id="47a17" binding="MovieResultPanel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
@@ -197,7 +224,7 @@
               <text value="Tag Ids and Values"/>
             </properties>
           </component>
-          <component id="64f59" class="javax.swing.JTextField" binding="valueTextField" default-binding="true">
+          <component id="64f59" class="javax.swing.JTextField" binding="tagValueTextField">
             <constraints>
               <grid row="6" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -213,6 +240,7 @@
             </constraints>
             <properties>
               <model>
+                <item value="=,&lt;,&gt;,&gt;=,&lt;="/>
                 <item value="="/>
                 <item value="&lt;"/>
                 <item value="&gt;"/>
@@ -221,7 +249,7 @@
               </model>
             </properties>
           </component>
-          <component id="8b333" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
+          <component id="8b333" class="javax.swing.JComboBox" binding="selectAndOrComboBox">
             <constraints>
               <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
