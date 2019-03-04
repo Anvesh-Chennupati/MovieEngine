@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static java.lang.Character.UnicodeBlock.TAGS;
 
@@ -61,6 +62,9 @@ public class hw3 {
     private JButton castSearchButton3;
     private JComboBox directorSearchCB;
     private JPanel tagPanel;
+    private JComboBox tagValueComboBox;
+    private JLabel tagWeightLabel;
+    private JLabel TagValueLabel;
 
 
     //global variables
@@ -222,9 +226,6 @@ public class hw3 {
         tagidLabel.setForeground(new Color(-1));
         tagidLabel.setText("Tag Ids and Values");
         topPanel.add(tagidLabel, new GridConstraints(1, 5, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        tagValueTextField = new JTextField();
-        tagValueTextField.setText("Value");
-        topPanel.add(tagValueTextField, new GridConstraints(9, 6, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 4, false));
         tagWeightComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel5 = new DefaultComboBoxModel();
         defaultComboBoxModel5.addElement("=,<,>,>=,<=");
@@ -234,7 +235,7 @@ public class hw3 {
         defaultComboBoxModel5.addElement("<=");
         defaultComboBoxModel5.addElement(">=");
         tagWeightComboBox.setModel(defaultComboBoxModel5);
-        topPanel.add(tagWeightComboBox, new GridConstraints(8, 7, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 3, false));
+        topPanel.add(tagWeightComboBox, new GridConstraints(8, 7, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         selectAndOrComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel6 = new DefaultComboBoxModel();
         defaultComboBoxModel6.addElement("Select And, OR");
@@ -271,14 +272,16 @@ public class hw3 {
         defaultComboBoxModel7.addElement("Choose Director");
         directorSearchCB.setModel(defaultComboBoxModel7);
         topPanel.add(directorSearchCB, new GridConstraints(7, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label1 = new JLabel();
-        label1.setForeground(new Color(-1));
-        label1.setText("Tag Weight");
-        topPanel.add(label1, new GridConstraints(8, 5, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label2 = new JLabel();
-        label2.setForeground(new Color(-1));
-        label2.setText("Tag Value");
-        topPanel.add(label2, new GridConstraints(9, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tagWeightLabel = new JLabel();
+        tagWeightLabel.setForeground(new Color(-1));
+        tagWeightLabel.setText("Tag Weight");
+        topPanel.add(tagWeightLabel, new GridConstraints(8, 5, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        TagValueLabel = new JLabel();
+        TagValueLabel.setForeground(new Color(-1));
+        TagValueLabel.setText("Tag Value");
+        topPanel.add(TagValueLabel, new GridConstraints(9, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        tagValueComboBox = new JComboBox();
+        topPanel.add(tagValueComboBox, new GridConstraints(9, 7, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         MainPanel.add(bottomPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -390,7 +393,7 @@ public class hw3 {
     //clearing all text fields
 
     private void removeAllText() {
-        tagValueTextField.setText("");
+//        tagValueTextField.setText("");
         queryResult.setText("");
     }
 
@@ -417,10 +420,21 @@ public class hw3 {
 
     private void updateTagPanel(ResultSet result) throws SQLException {
         removeTagPanel();
+        DefaultComboBoxModel defaultComboBoxModel6 = new DefaultComboBoxModel();
+        HashMap<Integer, Integer> uniqueWeight = new HashMap<Integer, Integer>();
         while (result.next()) {
             tagPanel.setLayout(new GridLayout(0, 1));
             String tagid = result.getString(1);
             String tagtext = result.getString(2);
+            Integer tagweight = result.getInt(3);
+            if (!uniqueWeight.containsKey(tagweight)) {
+                defaultComboBoxModel6.addElement(tagweight);
+                tagValueComboBox.setModel(defaultComboBoxModel6);
+                uniqueWeight.put(tagweight, tagweight);
+            } else {
+                continue;
+            }
+
             if (!tagid.equals(" ") && !tagtext.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(tagid + " " + tagtext);
                 cb.addActionListener(new ActionListener() {
@@ -476,7 +490,9 @@ public class hw3 {
                 e.printStackTrace();
             }
         } else {
-            removeCountryPanel();
+//            removeCountryPanel();
+            removeTagPanel();
+            tagValueComboBox.removeAllItems();
         }
     }
 
@@ -770,7 +786,7 @@ public class hw3 {
             toDatePicker.getModel().setYear(Integer.valueOf(actualEndYear));
             toDatePicker.getModel().setMonth(0);
             toDatePicker.getModel().setDay(1);
-
+            tagValueComboBox.removeAllItems();
             removeCountryPanel();
             removeTagPanel();
             removeAllText();
