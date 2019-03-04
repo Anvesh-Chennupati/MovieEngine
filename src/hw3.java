@@ -1,24 +1,14 @@
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import datechooser.beans.DateChooserCombo;
-import datechooser.events.CommitEvent;
-import datechooser.events.CommitListener;
-import datechooser.events.SelectionChangedEvent;
-import datechooser.events.SelectionChangedListener;
 import oracle.jdbc.OracleDriver;
 import org.jdatepicker.JDatePicker;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
 public class hw3 {
     private JPanel MainPanel;
@@ -33,7 +23,6 @@ public class hw3 {
     private JLabel movieResultLable;
     private JLabel searchbetweenLabel;
     private JLabel movieYearLabel;
-    private JTextField movieYearFrom;
     private JLabel directorLabel;
     private JTextField directorTextField;
     private JButton directorSearchButton;
@@ -58,8 +47,6 @@ public class hw3 {
     private JPanel countryPanel;
     private JLabel movieyearFromLabel;
     private JLabel movieYearToLabel;
-    private DateChooserCombo movieYearFromSelector;
-    private DateChooserCombo movieYearToSelector;
     private JDatePicker fromDatePicker;
     private JDatePicker toDatePicker;
 
@@ -615,7 +602,7 @@ public class hw3 {
         }
 
 
-        ResultSet result = null;
+        ResultSet result;
         // clean ui information
         removeGenrePanel();
         removeCountryPanel();
@@ -653,11 +640,6 @@ public class hw3 {
         performLoadButton();
         clearWindowsButton.addActionListener(e -> {
 //                removeGenrePanel();
-//                Date date = Calendar.getInstance().getTime();
-//                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//                System.out.println(formatter.format(date));
-//            movieYearFromSelector.setSelectedDate(Calendar.getInstance());
-//            movieYearToSelector.setSelectedDate(Calendar.getInstance());
             fromDatePicker.getModel().setYear(Integer.valueOf(actualStartYear));
             fromDatePicker.getModel().setMonth(0);
             fromDatePicker.getModel().setDay(1);
@@ -701,20 +683,6 @@ public class hw3 {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
-
-//        JFrame frame = new JFrame();
-//        frame.setPreferredSize(new Dimension(900, 900));
-//        frame.setTitle("Movie Query Engine");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//        frame.addComponentListener(new ComponentAdapter() {
-//            @Override
-//            public void componentResized(ComponentEvent e) {
-//                titleAlign(frame);
-//            }
-//
-//        });
-
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
