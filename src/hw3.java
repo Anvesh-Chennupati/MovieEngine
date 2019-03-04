@@ -1,6 +1,8 @@
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import datechooser.beans.DateChooserCombo;
 import oracle.jdbc.OracleDriver;
+import org.jdatepicker.JDatePicker;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,7 +10,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class hw3 {
     private JPanel MainPanel;
@@ -24,7 +30,6 @@ public class hw3 {
     private JLabel searchbetweenLabel;
     private JLabel movieYearLabel;
     private JTextField movieYearFrom;
-    private JTextField movieYearTo;
     private JLabel directorLabel;
     private JTextField directorTextField;
     private JButton directorSearchButton;
@@ -47,6 +52,11 @@ public class hw3 {
     private JScrollPane tagScrollPanel;
     private JPanel genrePanel;
     private JPanel countryPanel;
+    private JLabel movieyearFromLabel;
+    private JLabel movieYearToLabel;
+    private DateChooserCombo movieYearFromSelector;
+    private DateChooserCombo movieYearToSelector;
+    private JDatePicker datepickertesting;
 
 
     //global variables
@@ -88,100 +98,105 @@ public class hw3 {
     private void $$$setupUI$$$() {
         MainPanel = new JPanel();
         MainPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        MainPanel.setBackground(new Color(-12368461));
+        MainPanel.setBackground(new Color(-16777216));
         MainPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-16777216)), null));
         topPanel = new JPanel();
-        topPanel.setLayout(new GridLayoutManager(7, 11, new Insets(0, 0, 0, 0), -1, -1));
-        topPanel.setBackground(new Color(-12828863));
+        topPanel.setLayout(new GridLayoutManager(7, 12, new Insets(0, 0, 0, 0), -1, -1));
+        topPanel.setBackground(new Color(-16777216));
         topPanel.setEnabled(true);
         Font topPanelFont = this.$$$getFont$$$("Century Schoolbook", Font.BOLD, 16, topPanel.getFont());
         if (topPanelFont != null) topPanel.setFont(topPanelFont);
         MainPanel.add(topPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(24, 271), null, 0, false));
         genreScrollPanel = new JScrollPane();
-        topPanel.add(genreScrollPanel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        genreScrollPanel.setBackground(new Color(-14275789));
+        genreScrollPanel.setForeground(new Color(-14275789));
+        topPanel.add(genreScrollPanel, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         genrePanel = new JPanel();
         genrePanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        genrePanel.setEnabled(true);
+        genrePanel.setForeground(new Color(-14275789));
         genreScrollPanel.setViewportView(genrePanel);
         CountryScrollPanel = new JScrollPane();
         CountryScrollPanel.setHorizontalScrollBarPolicy(30);
-        topPanel.add(CountryScrollPanel, new GridConstraints(2, 1, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        topPanel.add(CountryScrollPanel, new GridConstraints(2, 2, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         countryPanel = new JPanel();
         countryPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         CountryScrollPanel.setViewportView(countryPanel);
         castPanel = new JPanel();
         castPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        topPanel.add(castPanel, new GridConstraints(2, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        topPanel.add(castPanel, new GridConstraints(2, 3, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         Tagpanel = new JPanel();
         Tagpanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        topPanel.add(Tagpanel, new GridConstraints(2, 4, 3, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        topPanel.add(Tagpanel, new GridConstraints(2, 5, 3, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         tagScrollPanel = new JScrollPane();
         Tagpanel.add(tagScrollPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         MovieResultPanel = new JPanel();
         MovieResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        topPanel.add(MovieResultPanel, new GridConstraints(2, 5, 5, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        topPanel.add(MovieResultPanel, new GridConstraints(2, 6, 5, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         movieResultScrollPane = new JScrollPane();
         MovieResultPanel.add(movieResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         movieAttributes = new JLabel();
         Font movieAttributesFont = this.$$$getFont$$$("Century Schoolbook", Font.BOLD, 16, movieAttributes.getFont());
         if (movieAttributesFont != null) movieAttributes.setFont(movieAttributesFont);
+        movieAttributes.setForeground(new Color(-1));
         movieAttributes.setText("Movie Attributes");
-        topPanel.add(movieAttributes, new GridConstraints(0, 0, 1, 5, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(movieAttributes, new GridConstraints(0, 0, 1, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         movieResultLable = new JLabel();
         Font movieResultLableFont = this.$$$getFont$$$("Century Schoolbook", Font.BOLD, 16, movieResultLable.getFont());
         if (movieResultLableFont != null) movieResultLable.setFont(movieResultLableFont);
+        movieResultLable.setForeground(new Color(-1));
         movieResultLable.setText("Movie Results");
-        topPanel.add(movieResultLable, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(movieResultLable, new GridConstraints(0, 6, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         searchbetweenLabel = new JLabel();
         Font searchbetweenLabelFont = this.$$$getFont$$$("Century Schoolbook", Font.BOLD, 16, searchbetweenLabel.getFont());
         if (searchbetweenLabelFont != null) searchbetweenLabel.setFont(searchbetweenLabelFont);
+        searchbetweenLabel.setForeground(new Color(-1));
         searchbetweenLabel.setText("Search Between Attribute  Values:");
-        topPanel.add(searchbetweenLabel, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(searchbetweenLabel, new GridConstraints(6, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         movieYearLabel = new JLabel();
         Font movieYearLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, movieYearLabel.getFont());
         if (movieYearLabelFont != null) movieYearLabel.setFont(movieYearLabelFont);
+        movieYearLabel.setForeground(new Color(-1));
         movieYearLabel.setText("Movie Year");
         topPanel.add(movieYearLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        movieYearFrom = new JTextField();
-        movieYearFrom.setText("From");
-        movieYearFrom.setToolTipText("From");
-        topPanel.add(movieYearFrom, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        movieYearTo = new JTextField();
-        movieYearTo.setText("To");
-        movieYearTo.setToolTipText("To");
-        topPanel.add(movieYearTo, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         directorLabel = new JLabel();
         Font directorLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, directorLabel.getFont());
         if (directorLabelFont != null) directorLabel.setFont(directorLabelFont);
+        directorLabel.setForeground(new Color(-1));
         directorLabel.setText("Director");
-        topPanel.add(directorLabel, new GridConstraints(3, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(directorLabel, new GridConstraints(3, 3, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         directorTextField = new JTextField();
-        topPanel.add(directorTextField, new GridConstraints(4, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        topPanel.add(directorTextField, new GridConstraints(4, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         directorSearchButton = new JButton();
         directorSearchButton.setText("Search");
-        topPanel.add(directorSearchButton, new GridConstraints(4, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(directorSearchButton, new GridConstraints(4, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         genreLabel = new JLabel();
         Font genreLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, genreLabel.getFont());
         if (genreLabelFont != null) genreLabel.setFont(genreLabelFont);
+        genreLabel.setForeground(new Color(-1));
         genreLabel.setText("Genres");
         topPanel.add(genreLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         countryLabel = new JLabel();
         Font countryLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, countryLabel.getFont());
         if (countryLabelFont != null) countryLabel.setFont(countryLabelFont);
+        countryLabel.setForeground(new Color(-1));
         countryLabel.setText("Country");
-        topPanel.add(countryLabel, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(countryLabel, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         castLabel = new JLabel();
         Font castLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, castLabel.getFont());
         if (castLabelFont != null) castLabel.setFont(castLabelFont);
+        castLabel.setForeground(new Color(-1));
         castLabel.setText("Cast");
-        topPanel.add(castLabel, new GridConstraints(1, 2, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(castLabel, new GridConstraints(1, 3, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         tagidLabel = new JLabel();
         Font tagidLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, tagidLabel.getFont());
         if (tagidLabelFont != null) tagidLabel.setFont(tagidLabelFont);
+        tagidLabel.setForeground(new Color(-1));
         tagidLabel.setText("Tag Ids and Values");
-        topPanel.add(tagidLabel, new GridConstraints(1, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(tagidLabel, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         tagValueTextField = new JTextField();
         tagValueTextField.setText("Value");
-        topPanel.add(tagValueTextField, new GridConstraints(6, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        topPanel.add(tagValueTextField, new GridConstraints(6, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         tagWeightComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
         defaultComboBoxModel1.addElement("=,<,>,>=,<=");
@@ -191,14 +206,26 @@ public class hw3 {
         defaultComboBoxModel1.addElement("<=");
         defaultComboBoxModel1.addElement(">=");
         tagWeightComboBox.setModel(defaultComboBoxModel1);
-        topPanel.add(tagWeightComboBox, new GridConstraints(5, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(tagWeightComboBox, new GridConstraints(5, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         selectAndOrComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
         defaultComboBoxModel2.addElement("Select And, OR");
         defaultComboBoxModel2.addElement("AND");
         defaultComboBoxModel2.addElement("OR");
         selectAndOrComboBox.setModel(defaultComboBoxModel2);
-        topPanel.add(selectAndOrComboBox, new GridConstraints(6, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        topPanel.add(selectAndOrComboBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        movieYearFromSelector = new DateChooserCombo();
+        topPanel.add(movieYearFromSelector, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        movieYearToSelector = new DateChooserCombo();
+        topPanel.add(movieYearToSelector, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        movieyearFromLabel = new JLabel();
+        movieyearFromLabel.setForeground(new Color(-1));
+        movieyearFromLabel.setText("From");
+        topPanel.add(movieyearFromLabel, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        movieYearToLabel = new JLabel();
+        movieYearToLabel.setForeground(new Color(-1));
+        movieYearToLabel.setText("To");
+        topPanel.add(movieYearToLabel, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         MainPanel.add(bottomPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -208,6 +235,8 @@ public class hw3 {
         bottomPanel.add(userResultPanel, new GridConstraints(0, 1, 5, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         userResultScrollPane = new JScrollPane();
         userResultPanel.add(userResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        datepickertesting = new JDatePicker();
+        userResultScrollPane.setViewportView(datepickertesting);
         QueryResultPanel = new JPanel();
         QueryResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         bottomPanel.add(QueryResultPanel, new GridConstraints(0, 0, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -288,11 +317,11 @@ public class hw3 {
     private void removeCountryPanel() {
         for (JCheckBox cb : selectedCountries) {
             cb.setVisible(false);
-            CountryScrollPanel.remove(cb);
+            countryPanel.remove(cb);
         }
         // clean global list and update CountryPanel
         selectedCountries.clear();
-        CountryScrollPanel.updateUI();
+        countryPanel.updateUI();
     }
 
     //clear tag panel
@@ -310,8 +339,6 @@ public class hw3 {
     //clearing all text fields
 
     private void removeAllText() {
-        movieYearFrom.setText("");
-        movieYearTo.setText("");
         directorTextField.setText("");
         tagValueTextField.setText("");
         queryResult.setText("");
@@ -542,6 +569,33 @@ public class hw3 {
         searchCondition = "OR";
         queryCondition = "AND";
         performLoadButton();
+        clearWindowsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                removeGenrePanel();
+//                Date date = Calendar.getInstance().getTime();
+//                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//                System.out.println(formatter.format(date));
+                movieYearFromSelector.setSelectedDate(Calendar.getInstance());
+                movieYearToSelector.setSelectedDate(Calendar.getInstance());
+                removeCountryPanel();
+                removeTagPanel();
+                removeAllText();
+                tagWeightComboBox.setSelectedIndex(0);
+                selectAndOrComboBox.setSelectedIndex(0);
+            }
+        });
+        selectAndOrComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //System.out.println(selectAndOrComboBox.getSelectedItem());
+                if (selectAndOrComboBox.getSelectedItem() == "AND" || selectAndOrComboBox.getSelectedItem() == "OR") {
+//                    System.out.println(selectAndOrComboBox.getSelectedItem());
+                    searchCondition = selectAndOrComboBox.getSelectedItem().toString();
+                    loadCountry();
+                }
+            }
+        });
     }
 
     public void startQueryEngine() {
