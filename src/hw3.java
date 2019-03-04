@@ -11,8 +11,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static java.lang.Character.UnicodeBlock.TAGS;
-
 public class hw3 {
     private JPanel MainPanel;
     private JPanel topPanel;
@@ -27,15 +25,13 @@ public class hw3 {
     private JLabel searchbetweenLabel;
     private JLabel movieYearLabel;
     private JLabel directorLabel;
-    private JTextField directorTextField;
     private JButton directorSearchButton;
     private JLabel genreLabel;
     private JLabel countryLabel;
     private JLabel castLabel;
     private JLabel tagidLabel;
-    private JTextField tagValueTextField;
-    private JComboBox tagWeightComboBox;
-    private JComboBox selectAndOrComboBox;
+    private JComboBox<String> tagWeightComboBox;
+    private JComboBox<String> selectAndOrComboBox;
     private JPanel userResultPanel;
     private JPanel QueryResultPanel;
     private JPanel buttonPanel;
@@ -52,17 +48,17 @@ public class hw3 {
     private JLabel movieYearToLabel;
     private JDatePicker fromDatePicker;
     private JDatePicker toDatePicker;
-    private JComboBox castSearchCB1;
-    private JComboBox castSearchCB4;
-    private JComboBox castSearchCB2;
-    private JComboBox castSearchCB3;
+    private JComboBox<String> castSearchCB1;
+    private JComboBox<String> castSearchCB4;
+    private JComboBox<String> castSearchCB2;
+    private JComboBox<String> castSearchCB3;
     private JButton castSearchButton1;
     private JButton castSearchButton4;
     private JButton castSearchButton2;
     private JButton castSearchButton3;
-    private JComboBox directorSearchCB;
+    private JComboBox<String> directorSearchCB;
     private JPanel tagPanel;
-    private JComboBox tagValueComboBox;
+    private JComboBox<Integer> tagValueComboBox;
     private JLabel tagWeightLabel;
     private JLabel TagValueLabel;
 
@@ -71,7 +67,6 @@ public class hw3 {
 
     private ArrayList<JCheckBox> selectedGenres;
     private ArrayList<JCheckBox> selectedCountries;
-    private ArrayList<JCheckBox> selectedFilmCountries;
     private ArrayList<JCheckBox> selectedTags;
     private String searchCondition;
     private String queryCondition;
@@ -420,8 +415,8 @@ public class hw3 {
 
     private void updateTagPanel(ResultSet result) throws SQLException {
         removeTagPanel();
-        DefaultComboBoxModel defaultComboBoxModel6 = new DefaultComboBoxModel();
-        HashMap<Integer, Integer> uniqueWeight = new HashMap<Integer, Integer>();
+        DefaultComboBoxModel<Integer> defaultComboBoxModel6 = new DefaultComboBoxModel<>();
+        HashMap<Integer, Integer> uniqueWeight = new HashMap<>();
         while (result.next()) {
             tagPanel.setLayout(new GridLayout(0, 1));
             String tagid = result.getString(1);
@@ -437,19 +432,16 @@ public class hw3 {
 
             if (!tagid.equals(" ") && !tagtext.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(tagid + " " + tagtext);
-                cb.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        /*
-                        if (searchCondition == "OR") {
-                            loadAllFilmCountry();
-                        } else if (searchCondition == "AND") {
-                            loadFilmCountry();
-                        }
-                        */
+                cb.addActionListener(e -> {
+                    /*
+                    if (searchCondition == "OR") {
+                        loadAllFilmCountry();
+                    } else if (searchCondition == "AND") {
+                        loadFilmCountry();
+                    }
+                    */
 //                        loadTags();
 
-                    }
                 });
                 selectedTags.add(cb);
                 tagPanel.add(cb);
@@ -503,18 +495,15 @@ public class hw3 {
             String text = result.getString(1);
             if (!text.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(text);
-                cb.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        /*
-                        if (searchCondition == "OR") {
-                            loadAllFilmCountry();
-                        } else if (searchCondition == "AND") {
-                            loadFilmCountry();
-                        }
-                        */
-                        loadTags();
+                cb.addActionListener(e -> {
+                    /*
+                    if (searchCondition == "OR") {
+                        loadAllFilmCountry();
+                    } else if (searchCondition == "AND") {
+                        loadFilmCountry();
                     }
+                    */
+                    loadTags();
                 });
                 selectedCountries.add(cb);
                 countryPanel.add(cb);
@@ -626,19 +615,16 @@ public class hw3 {
             JCheckBox cb = new JCheckBox(result.getString(1));
 //            System.out.println(result.getString(1));
 
-            cb.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    /*
-                    if (searchCondition == "OR") {
-                        loadAllCountry();
-                    } else if (searchCondition == "AND") {
-                        loadCountry();
-                    }
-                    */
-                    // according 3) the countries matching the genres selections will be listed
+            cb.addActionListener(e -> {
+                /*
+                if (searchCondition == "OR") {
+                    loadAllCountry();
+                } else if (searchCondition == "AND") {
                     loadCountry();
                 }
+                */
+                // according 3) the countries matching the genres selections will be listed
+                loadCountry();
             });
             // add all queried genres JCheckbox to global variable
             selectedGenres.add(cb);
@@ -683,7 +669,7 @@ public class hw3 {
      *  Query Execute function
      */
     private ResultSet executeQuery(String query) {
-        Statement stmt = null;
+        Statement stmt;
         ResultSet result = null;
         try {
             System.out.print("Connect DB .... ");
@@ -691,12 +677,8 @@ public class hw3 {
             System.out.println("successfully ");
             stmt = conn.createStatement();
             result = stmt.executeQuery(query);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            //closeConnect();
         }
 
         return result;
@@ -710,8 +692,10 @@ public class hw3 {
         ResultSetMetaData meta = result.getMetaData();
         //int tupleCount = 1;
         while (result.next()) {
-            // System.out.print("Tuple " + tupleCount++ + " : ");
-            // System.out.print("Tuple " + tupleCount++ + " : ");
+            /*
+            System.out.print("Tuple " + tupleCount++ + " : ");
+            System.out.print("Tuple " + tupleCount++ + " : ");
+            */
             for (int col = 1; col <= meta.getColumnCount(); col++) {
 
                 System.out.print("\"" + result.getString(col) + "\",");
@@ -769,11 +753,11 @@ public class hw3 {
     }
 
 
-    public hw3() {
+    private hw3() {
         conn = null;
         selectedGenres = new ArrayList<>();
         selectedCountries = new ArrayList<>();
-        selectedFilmCountries = new ArrayList<>();
+//        selectedFilmCountries = new ArrayList<>();
         selectedTags = new ArrayList<>();
         searchCondition = "OR";
         queryCondition = "AND";
@@ -815,7 +799,7 @@ public class hw3 {
         });
     }
 
-    public void startQueryEngine() {
+    private void startQueryEngine() {
         // initialize UI framework
 
         JFrame frame = new JFrame("Movie Query Engine");
@@ -829,7 +813,7 @@ public class hw3 {
     }
 
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 //        System.out.println("Hello");
         hw3 startPoint = new hw3();
         startPoint.startQueryEngine();
