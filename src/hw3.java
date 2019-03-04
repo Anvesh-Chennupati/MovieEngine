@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 
+import static java.lang.Character.UnicodeBlock.TAGS;
+
 public class hw3 {
     private JPanel MainPanel;
     private JPanel topPanel;
@@ -58,6 +60,7 @@ public class hw3 {
     private JButton castSearchButton2;
     private JButton castSearchButton3;
     private JComboBox directorSearchCB;
+    private JPanel tagPanel;
 
 
     //global variables
@@ -127,6 +130,7 @@ public class hw3 {
         CountryScrollPanel.setViewportView(countryPanel);
         castPanel = new JPanel();
         castPanel.setLayout(new GridLayoutManager(4, 1, new Insets(0, 0, 0, 0), -1, -1));
+        castPanel.setForeground(new Color(-16777216));
         topPanel.add(castPanel, new GridConstraints(2, 3, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         castSearchCB1 = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
@@ -153,6 +157,9 @@ public class hw3 {
         topPanel.add(Tagpanel, new GridConstraints(2, 5, 6, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         tagScrollPanel = new JScrollPane();
         Tagpanel.add(tagScrollPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        tagPanel = new JPanel();
+        tagPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tagScrollPanel.setViewportView(tagPanel);
         MovieResultPanel = new JPanel();
         MovieResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         topPanel.add(MovieResultPanel, new GridConstraints(2, 8, 8, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -373,11 +380,11 @@ public class hw3 {
     private void removeTagPanel() {
         for (JCheckBox cb : selectedTags) {
             cb.setVisible(false);
-            tagScrollPanel.remove(cb);
+            tagPanel.remove(cb);
         }
         // clean global list and update FilmPanel
         selectedTags.clear();
-        tagScrollPanel.updateUI();
+        tagPanel.updateUI();
     }
 
     //clearing all text fields
@@ -408,6 +415,71 @@ public class hw3 {
         return checkList;
     }
 
+    private void updateTagPanel(ResultSet result) throws SQLException {
+        removeTagPanel();
+        while (result.next()) {
+            tagPanel.setLayout(new GridLayout(0, 1));
+            String tagid = result.getString(1);
+            String tagtext = result.getString(2);
+            if (!tagid.equals(" ") && !tagtext.equals(" ")) { // some genres don't have country
+                JCheckBox cb = new JCheckBox(tagid + " " + tagtext);
+                cb.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        /*
+                        if (searchCondition == "OR") {
+                            loadAllFilmCountry();
+                        } else if (searchCondition == "AND") {
+                            loadFilmCountry();
+                        }
+                        */
+//                        loadTags();
+
+                    }
+                });
+                selectedTags.add(cb);
+                tagPanel.add(cb);
+                tagPanel.revalidate();
+                tagPanel.repaint();
+            }
+        }
+    }
+
+    private void loadTags() {
+        ArrayList<String> checkList = selectCheckBox(AttrType.Countries);
+        ResultSet result = null;
+
+        if (checkList.size() != 0) {
+            StringBuilder sb = new StringBuilder();
+            // prepare query command
+
+            sb.append("select distinct mtag.TAGID,tag.VALUE, mtag.TAGWEIGHT\n");
+            sb.append("from MOVIE_TAGS mtag, TAGS tag, MOVIE_COUNTRIES loc, MOVIES mov1\n");
+            sb.append("where mov1.MOVIEID = mtag.MOVIEID\n");
+            sb.append("and mov1.MOVIEID = loc.MOVIEID\n");
+            sb.append("and tag.TAGID = mtag.TAGID\n");
+            sb.append("and loc.COUNTRY in (");
+            for (int i = 0; i < checkList.size(); i++) {
+                if (i != checkList.size() - 1) {
+                    sb.append("'").append(checkList.get(i)).append("',");
+                } else {
+                    sb.append("'").append(checkList.get(i)).append("'");
+                }
+            }
+            sb.append(")");
+            queryResult.setText(sb.toString());
+            // connection DB and execute query command
+            try {
+                result = executeQuery(sb.toString());
+                updateTagPanel(result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            removeCountryPanel();
+        }
+    }
+
     private void updateCountryPanel(ResultSet result) throws SQLException {
         removeCountryPanel();
         while (result.next()) {
@@ -425,6 +497,7 @@ public class hw3 {
                             loadFilmCountry();
                         }
                         */
+                        loadTags();
                     }
                 });
                 selectedCountries.add(cb);
