@@ -1,6 +1,10 @@
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import datechooser.beans.DateChooserCombo;
+import datechooser.events.CommitEvent;
+import datechooser.events.CommitListener;
+import datechooser.events.SelectionChangedEvent;
+import datechooser.events.SelectionChangedListener;
 import oracle.jdbc.OracleDriver;
 import org.jdatepicker.JDatePicker;
 
@@ -56,7 +60,8 @@ public class hw3 {
     private JLabel movieYearToLabel;
     private DateChooserCombo movieYearFromSelector;
     private DateChooserCombo movieYearToSelector;
-    private JDatePicker datepickertesting;
+    private JDatePicker fromDatePicker;
+    private JDatePicker toDatePicker;
 
 
     //global variables
@@ -69,12 +74,14 @@ public class hw3 {
     private String queryCondition;
     private Connection conn;
     private DefaultTableModel tModel;
-    private String criticRating;
-    private String criticValue;
-    private String numOfReview;
-    private String reviewValue;
-    private String yearFrom;
-    private String yearTo;
+    //    private String criticRating;
+//    private String criticValue;
+//    private String numOfReview;
+//    private String reviewValue;
+    private Integer selectedMovieFrom = 1600;
+    private Integer selectedMovieTo = 2999;
+    private String actualStartYear = "";
+    private String actualEndYear = "";
 
     public enum AttrType {
         Genres,
@@ -214,10 +221,6 @@ public class hw3 {
         defaultComboBoxModel2.addElement("OR");
         selectAndOrComboBox.setModel(defaultComboBoxModel2);
         topPanel.add(selectAndOrComboBox, new GridConstraints(6, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        movieYearFromSelector = new DateChooserCombo();
-        topPanel.add(movieYearFromSelector, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        movieYearToSelector = new DateChooserCombo();
-        topPanel.add(movieYearToSelector, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         movieyearFromLabel = new JLabel();
         movieyearFromLabel.setForeground(new Color(-1));
         movieyearFromLabel.setText("From");
@@ -226,6 +229,10 @@ public class hw3 {
         movieYearToLabel.setForeground(new Color(-1));
         movieYearToLabel.setText("To");
         topPanel.add(movieYearToLabel, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        fromDatePicker = new JDatePicker();
+        topPanel.add(fromDatePicker, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        toDatePicker = new JDatePicker();
+        topPanel.add(toDatePicker, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
         MainPanel.add(bottomPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
@@ -235,8 +242,6 @@ public class hw3 {
         bottomPanel.add(userResultPanel, new GridConstraints(0, 1, 5, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         userResultScrollPane = new JScrollPane();
         userResultPanel.add(userResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        datepickertesting = new JDatePicker();
-        userResultScrollPane.setViewportView(datepickertesting);
         QueryResultPanel = new JPanel();
         QueryResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         bottomPanel.add(QueryResultPanel, new GridConstraints(0, 0, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -399,23 +404,79 @@ public class hw3 {
         if (checkList.size() != 0) {
             StringBuilder sb = new StringBuilder();
             // prepare query command
-            sb.append("SELECT DISTINCT country\n");
-            sb.append("FROM movie_countries loc, ");
-            sb.append("(");
-            sb.append("SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
-            sb.append("FROM movie_genres\n");
-            sb.append("GROUP BY movieID) select_genre\n");
-            sb.append("WHERE select_genre.movieID = loc.movieID AND ");
-            sb.append("(");
-            for (int i = 0; i < checkList.size(); i++) {
-                if (i == 0) {
-                    sb.append("select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
-                } else {
-                    sb.append(searchCondition + " select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+
+            if ((selectedMovieFrom == 1600) && (selectedMovieTo == 2999)) {
+                sb.append("SELECT DISTINCT country\n");
+                sb.append("FROM movie_countries loc, ");
+                sb.append("(");
+                sb.append("SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
+                sb.append("FROM movie_genres\n");
+                sb.append("GROUP BY movieID) select_genre\n");
+                sb.append("WHERE select_genre.movieID = loc.movieID AND ");
+                sb.append("(");
+                for (int i = 0; i < checkList.size(); i++) {
+                    if (i == 0) {
+                        sb.append("select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+                    } else {
+                        sb.append(searchCondition + " select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+                    }
                 }
+                sb.append(")\n");
+                sb.append("ORDER BY country");
+            } else {
+                System.out.println(selectedMovieFrom);
+                System.out.println(actualStartYear);
+                System.out.println(actualEndYear);
+                String starty = selectedMovieFrom.toString();
+                String endy = selectedMovieTo.toString();
+                if (selectedMovieFrom > Integer.valueOf(actualEndYear)) {
+                    System.out.println("Invalid start year. Setting the start year to " + actualStartYear);
+                    starty = actualStartYear;
+                }
+                if (selectedMovieTo < Integer.valueOf(actualStartYear)) {
+                    System.out.println("Invalid start year. Setting the start end to " + actualEndYear);
+                    endy = actualEndYear;
+                }
+
+                sb.append("SELECT DISTINCT country\n");
+                sb.append("FROM movie_countries loc, ");
+                sb.append("(");
+                sb.append("SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
+                sb.append("FROM movie_genres\n");
+                sb.append("GROUP BY movieID) select_genre");
+                sb.append(", MOVIES mov\n");
+                sb.append("WHERE select_genre.movieID = loc.movieID AND ");
+                sb.append(" loc.MOVIEID = mov.MOVIEID AND");
+                sb.append(" mov.YEAR between ").append(starty).append(" and ").append(endy).append(" AND ");
+                sb.append("(");
+                for (int i = 0; i < checkList.size(); i++) {
+                    if (i == 0) {
+                        sb.append("select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+                    } else {
+                        sb.append(searchCondition + " select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+                    }
+                }
+                sb.append(")\n");
+                sb.append("ORDER BY country");
+
             }
-            sb.append(")\n");
-            sb.append("ORDER BY country");
+//            sb.append("SELECT DISTINCT country\n");
+//            sb.append("FROM movie_countries loc, ");
+//            sb.append("(");
+//            sb.append("SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
+//            sb.append("FROM movie_genres\n");
+//            sb.append("GROUP BY movieID) select_genre\n");
+//            sb.append("WHERE select_genre.movieID = loc.movieID AND ");
+//            sb.append("(");
+//            for (int i = 0; i < checkList.size(); i++) {
+//                if (i == 0) {
+//                    sb.append("select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+//                } else {
+//                    sb.append(searchCondition + " select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
+//                }
+//            }
+//            sb.append(")\n");
+//            sb.append("ORDER BY country");
             queryResult.setText(sb.toString());
             // connection DB and execute query command
             try {
@@ -533,6 +594,27 @@ public class hw3 {
     }
 
     private void performLoadButton() {
+        //getting the actual start and end year from table
+        String queryForStartYear = "select * from (select mov.YEAR from MOVIES mov order by mov.YEAR asc) where ROWNUM <=1";
+        String queryForEndYear = "select * from (select mov.YEAR from MOVIES mov order by mov.YEAR desc) where ROWNUM <=1";
+        ResultSet qfsy;
+        ResultSet qfey;
+
+        try {
+            qfsy = executeQuery(queryForStartYear);
+            qfey = executeQuery(queryForEndYear);
+            while (qfsy.next()) {
+                actualStartYear = qfsy.getString(1);
+            }
+            while (qfey.next()) {
+                actualEndYear = qfey.getString(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         ResultSet result = null;
         // clean ui information
         removeGenrePanel();
@@ -569,32 +651,45 @@ public class hw3 {
         searchCondition = "OR";
         queryCondition = "AND";
         performLoadButton();
-        clearWindowsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        clearWindowsButton.addActionListener(e -> {
 //                removeGenrePanel();
 //                Date date = Calendar.getInstance().getTime();
 //                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 //                System.out.println(formatter.format(date));
-                movieYearFromSelector.setSelectedDate(Calendar.getInstance());
-                movieYearToSelector.setSelectedDate(Calendar.getInstance());
-                removeCountryPanel();
-                removeTagPanel();
-                removeAllText();
-                tagWeightComboBox.setSelectedIndex(0);
-                selectAndOrComboBox.setSelectedIndex(0);
+//            movieYearFromSelector.setSelectedDate(Calendar.getInstance());
+//            movieYearToSelector.setSelectedDate(Calendar.getInstance());
+            fromDatePicker.getModel().setYear(Integer.valueOf(actualStartYear));
+            fromDatePicker.getModel().setMonth(0);
+            fromDatePicker.getModel().setDay(1);
+            toDatePicker.getModel().setYear(Integer.valueOf(actualEndYear));
+            toDatePicker.getModel().setMonth(0);
+            toDatePicker.getModel().setDay(1);
+
+            removeCountryPanel();
+            removeTagPanel();
+            removeAllText();
+            tagWeightComboBox.setSelectedIndex(0);
+            selectAndOrComboBox.setSelectedIndex(0);
+        });
+        selectAndOrComboBox.addActionListener(e -> {
+            //System.out.println(selectAndOrComboBox.getSelectedItem());
+            if (selectAndOrComboBox.getSelectedItem() == "AND" || selectAndOrComboBox.getSelectedItem() == "OR") {
+//                    System.out.println(selectAndOrComboBox.getSelectedItem());
+                searchCondition = selectAndOrComboBox.getSelectedItem().toString();
+                loadCountry();
             }
         });
-        selectAndOrComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //System.out.println(selectAndOrComboBox.getSelectedItem());
-                if (selectAndOrComboBox.getSelectedItem() == "AND" || selectAndOrComboBox.getSelectedItem() == "OR") {
-//                    System.out.println(selectAndOrComboBox.getSelectedItem());
-                    searchCondition = selectAndOrComboBox.getSelectedItem().toString();
-                    loadCountry();
-                }
-            }
+
+        fromDatePicker.addActionListener(e -> {
+            selectedMovieFrom = fromDatePicker.getModel().getYear();
+            System.out.println(selectedMovieFrom);
+            loadCountry();
+
+        });
+        toDatePicker.addActionListener(e -> {
+            selectedMovieTo = toDatePicker.getModel().getYear();
+            System.out.println(selectedMovieTo);
+            loadCountry();
         });
     }
 

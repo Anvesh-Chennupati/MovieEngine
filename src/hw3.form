@@ -254,18 +254,6 @@
               </model>
             </properties>
           </component>
-          <component id="98a07" class="datechooser.beans.DateChooserCombo" binding="movieYearFromSelector">
-            <constraints>
-              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-          </component>
-          <component id="cf551" class="datechooser.beans.DateChooserCombo" binding="movieYearToSelector">
-            <constraints>
-              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-          </component>
           <component id="1ea36" class="javax.swing.JLabel" binding="movieyearFromLabel">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -283,6 +271,18 @@
               <foreground color="-1"/>
               <text value="To"/>
             </properties>
+          </component>
+          <component id="4dcce" class="org.jdatepicker.JDatePicker" binding="fromDatePicker">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="c18fc" class="org.jdatepicker.JDatePicker" binding="toDatePicker">
+            <constraints>
+              <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
           </component>
         </children>
       </grid>
@@ -310,12 +310,7 @@
                 </constraints>
                 <properties/>
                 <border type="none"/>
-                <children>
-                  <component id="45256" class="org.jdatepicker.JDatePicker" binding="datepickertesting">
-                    <constraints/>
-                    <properties/>
-                  </component>
-                </children>
+                <children/>
               </scrollpane>
             </children>
           </grid>
