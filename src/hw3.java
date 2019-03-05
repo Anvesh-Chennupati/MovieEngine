@@ -580,14 +580,7 @@ public class hw3 {
 //            System.out.println(result.getString(1));
 
             cb.addActionListener(e -> {
-                /*
-                if (searchCondition == "OR") {
-                    loadAllCountry();
-                } else if (searchCondition == "AND") {
-                    loadCountry();
-                }
-                */
-                // according 3) the countries matching the genres selections will be listed
+
                 loadCountry();
                 populateCast_directorCB();
             });
