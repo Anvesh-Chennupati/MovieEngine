@@ -4,10 +4,7 @@ import oracle.jdbc.OracleDriver;
 import org.jdatepicker.JDatePicker;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.xml.transform.Result;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,10 +71,6 @@ public class hw3 {
     private String queryCondition;
     private Connection conn;
     private DefaultTableModel tModel;
-    //    private String criticRating;
-//    private String criticValue;
-//    private String numOfReview;
-//    private String reviewValue;
     private Integer selectedMovieFrom = 1600;
     private Integer selectedMovieTo = 2999;
     private String actualStartYear = "";
@@ -311,7 +304,6 @@ public class hw3 {
     }
 
     /**
-     * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
         if (currentFont == null) return null;
@@ -334,23 +326,6 @@ public class hw3 {
      */
     public JComponent $$$getRootComponent$$$() {
         return MainPanel;
-    }
-
-    private void titleAlign(JFrame frame) {
-
-        Font font = frame.getFont();
-
-        String currentTitle = frame.getTitle().trim();
-        FontMetrics fm = frame.getFontMetrics(font);
-        int frameWidth = frame.getWidth();
-        int titleWidth = fm.stringWidth(currentTitle);
-        int spaceWidth = fm.stringWidth(" ");
-        int centerPos = (frameWidth / 2) - (titleWidth / 2);
-        int spaceCount = centerPos / spaceWidth;
-        String pad = "";
-        pad = String.format("%" + (spaceCount - 14) + "s", pad);
-        frame.setTitle(pad + currentTitle);
-
     }
 
     //UI methods
@@ -465,7 +440,7 @@ public class hw3 {
 
     private void loadTags() {
         ArrayList<String> checkList = selectCheckBox(AttrType.Countries);
-        ResultSet result = null;
+        ResultSet result;
 
         if (checkList.size() != 0) {
             StringBuilder sb = new StringBuilder();
@@ -528,7 +503,7 @@ public class hw3 {
 
     private void loadCountry() {
         ArrayList<String> checkList = selectCheckBox(AttrType.Genres);
-        ResultSet result = null;
+        ResultSet result;
 
         if (checkList.size() != 0) {
             StringBuilder sb = new StringBuilder();
@@ -719,22 +694,16 @@ public class hw3 {
     }
 
     private void populateCast_directorCB() {
-        directorSearchCB.removeAllItems();
-        castSearchCB1.removeAllItems();
-        castSearchCB2.removeAllItems();
-        castSearchCB3.removeAllItems();
-        castSearchCB4.removeAllItems();
+        removeComboBox();
         ArrayList<String> CountrycheckList = selectCheckBox(AttrType.Countries);
         ArrayList<String> genreCheckList = selectCheckBox(AttrType.Genres);
-        DefaultComboBoxModel<Integer> defaultComboBoxModel6 = new DefaultComboBoxModel<>();
+//        DefaultComboBoxModel<Integer> defaultComboBoxModel6 = new DefaultComboBoxModel<>();
         HashMap<String, Integer> uniqueCast = new HashMap<>();
         HashMap<String, Integer> uniqueDirector = new HashMap<>();
         ResultSet castRS;
         ResultSet directorRS;
         StringBuilder cast1 = new StringBuilder();
-        StringBuilder cast2 = new StringBuilder();
         StringBuilder director1 = new StringBuilder();
-        StringBuilder director2 = new StringBuilder();
 
         if (genreCheckList.size() != 0) {
             if (CountrycheckList.size() == 0) {
@@ -770,15 +739,26 @@ public class hw3 {
                 director1.append("ORDER BY md.DIRECTORNAME");
 
             } else {
-                cast1.append("select distinct ma.ACTORNAME\n");
-                cast1.append("from MOVIE_ACTORS ma, MOVIES mov, MOVIE_COUNTRIES loc\n");
-                cast1.append("where mov.MOVIEID = loc.MOVIEID\n");
-                cast1.append("and mov.MOVIEID = ma.MOVIEID\n");
+                cast1.append("select distinct  ma.ACTORNAME from MOVIE_ACTORS ma, MOVIES mov,\n" +
+                        "(SELECT movieID, LISTAGG(genre, ',')\n" +
+                        "WITHIN GROUP (ORDER BY genre) AS Genres\n" +
+                        "FROM movie_genres\n" +
+                        "GROUP BY movieID) select_genre,\n" +
+                        "MOVIE_COUNTRIES loc\n");
+                cast1.append("where ma.MOVIEID = mov.MOVIEID\n" +
+                        "and mov.MOVIEID = select_genre.MOVIEID\n" +
+                        "and mov.MOVIEID = loc.MOVIEID\n");
                 cast1.append("and loc.COUNTRY in (");
-                director1.append("select distinct md.DIRECTORNAME\n");
-                director1.append("from MOVIE_DIRECTORS md, MOVIES mov, MOVIE_COUNTRIES loc\n");
-                director1.append("where mov.MOVIEID = loc.MOVIEID\n");
-                director1.append("and mov.MOVIEID = md.MOVIEID\n");
+
+                director1.append("select distinct  md.DIRECTORNAME from MOVIE_DIRECTORS md, MOVIES mov,\n" +
+                        "(SELECT movieID, LISTAGG(genre, ',')\n" +
+                        "WITHIN GROUP (ORDER BY genre) AS Genres\n" +
+                        "FROM movie_genres\n" +
+                        "GROUP BY movieID) select_genre,\n" +
+                        "MOVIE_COUNTRIES loc\n");
+                director1.append("where md.MOVIEID = mov.MOVIEID\n" +
+                        "and mov.MOVIEID = select_genre.MOVIEID\n" +
+                        "and mov.MOVIEID = loc.MOVIEID\n");
                 director1.append("and loc.COUNTRY in (");
                 for (int i = 0; i < CountrycheckList.size(); i++) {
                     if (i != CountrycheckList.size() - 1) {
@@ -790,8 +770,24 @@ public class hw3 {
                     }
                 }
                 cast1.append(")\n");
-                cast1.append("ORDER BY ma.ACTORNAME");
+                cast1.append(" AND \n");
+                cast1.append("(");
                 director1.append(")\n");
+                director1.append(" AND \n");
+                director1.append("(");
+                for (int i = 0; i < genreCheckList.size(); i++) {
+                    if (i == 0) {
+                        cast1.append("select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                        director1.append("select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                    } else {
+                        cast1.append(searchCondition).append(" select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                        director1.append(searchCondition).append(" select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                    }
+                }
+                cast1.append(")\n");
+                director1.append(")\n");
+
+                cast1.append("ORDER BY ma.ACTORNAME");
                 director1.append("ORDER BY md.DIRECTORNAME");
 
             }
@@ -815,17 +811,13 @@ public class hw3 {
                         castSearchCB3.addItem(castName);
                         castSearchCB4.addItem(castName);
                         uniqueCast.put(castName, 1);
-                    } else {
-                        continue;
                     }
                 }
                 while (directorRS.next()) {
                     String directorName = directorRS.getString(1);
-                    if (!uniqueCast.containsKey(directorName)) {
+                    if (!uniqueDirector.containsKey(directorName)) {
                         directorSearchCB.addItem(directorName);
-                        uniqueCast.put(directorName, 1);
-                    } else {
-                        continue;
+                        uniqueDirector.put(directorName, 1);
                     }
                 }
             } catch (SQLException e) {
@@ -833,11 +825,7 @@ public class hw3 {
             }
         } else {
 //            removeCountryPanel();
-            castSearchCB1.removeAllItems();
-            castSearchCB2.removeAllItems();
-            castSearchCB3.removeAllItems();
-            castSearchCB4.removeAllItems();
-            directorSearchCB.removeAllItems();
+            removeComboBox();
 
         }
 
@@ -914,9 +902,7 @@ public class hw3 {
         queryResultTable.setModel(tModel);
         performLoadButton();
 
-        executeMovieQueryButton.addActionListener(e -> {
-            performMovieQuery();
-        });
+        executeMovieQueryButton.addActionListener(e -> performMovieQuery());
         clearWindowsButton.addActionListener(e -> {
 //                removeGenrePanel();
             fromDatePicker.getModel().setYear(Integer.valueOf(actualStartYear));

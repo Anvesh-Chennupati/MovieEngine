@@ -117,7 +117,7 @@ CREATE INDEX idx_rtaureivew ON movies(rtAudienceNumRatings);
 -- create movie_genres index
 CREATE INDEX idx_genres     ON movie_genres(genre);
 CREATE INDEX idx_gmid       ON movie_genres(movieID);
--- create movie_countris index
+-- create movie_countries index
 CREATE INDEX idx_cmid       ON movie_countries(movieID);
 CREATE INDEX idx_countries  ON movie_countries(country);
 -- create movie_locations index
