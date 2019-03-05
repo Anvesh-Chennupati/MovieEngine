@@ -4,6 +4,7 @@ import oracle.jdbc.OracleDriver;
 import org.jdatepicker.JDatePicker;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,6 +62,7 @@ public class hw3 {
     private JComboBox<Integer> tagValueComboBox;
     private JLabel tagWeightLabel;
     private JLabel TagValueLabel;
+    private JTable queryResultTable;
 
 
     //global variables
@@ -164,6 +166,8 @@ public class hw3 {
         topPanel.add(MovieResultPanel, new GridConstraints(2, 8, 8, 6, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         movieResultScrollPane = new JScrollPane();
         MovieResultPanel.add(movieResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        queryResultTable = new JTable();
+        movieResultScrollPane.setViewportView(queryResultTable);
         movieAttributes = new JLabel();
         Font movieAttributesFont = this.$$$getFont$$$("Century Schoolbook", Font.BOLD, 16, movieAttributes.getFont());
         if (movieAttributesFont != null) movieAttributes.setFont(movieAttributesFont);
@@ -392,6 +396,14 @@ public class hw3 {
         queryResult.setText("");
     }
 
+    private void removeComboBox() {
+        castSearchCB1.removeAllItems();
+        castSearchCB2.removeAllItems();
+        castSearchCB3.removeAllItems();
+        castSearchCB4.removeAllItems();
+        directorSearchCB.removeAllItems();
+    }
+
     // updating fields
 
     /*
@@ -504,6 +516,7 @@ public class hw3 {
                     }
                     */
                     loadTags();
+                    populateCast_directorCB();
                 });
                 selectedCountries.add(cb);
                 countryPanel.add(cb);
@@ -625,6 +638,7 @@ public class hw3 {
                 */
                 // according 3) the countries matching the genres selections will be listed
                 loadCountry();
+                populateCast_directorCB();
             });
             // add all queried genres JCheckbox to global variable
             selectedGenres.add(cb);
@@ -704,6 +718,135 @@ public class hw3 {
         }
     }
 
+    private void populateCast_directorCB() {
+        directorSearchCB.removeAllItems();
+        castSearchCB1.removeAllItems();
+        castSearchCB2.removeAllItems();
+        castSearchCB3.removeAllItems();
+        castSearchCB4.removeAllItems();
+        ArrayList<String> CountrycheckList = selectCheckBox(AttrType.Countries);
+        ArrayList<String> genreCheckList = selectCheckBox(AttrType.Genres);
+        DefaultComboBoxModel<Integer> defaultComboBoxModel6 = new DefaultComboBoxModel<>();
+        HashMap<String, Integer> uniqueCast = new HashMap<>();
+        HashMap<String, Integer> uniqueDirector = new HashMap<>();
+        ResultSet castRS;
+        ResultSet directorRS;
+        StringBuilder cast1 = new StringBuilder();
+        StringBuilder cast2 = new StringBuilder();
+        StringBuilder director1 = new StringBuilder();
+        StringBuilder director2 = new StringBuilder();
+
+        if (genreCheckList.size() != 0) {
+            if (CountrycheckList.size() == 0) {
+                cast1.append("select distinct ma.ACTORNAME from MOVIE_ACTORS ma,\n");
+                cast1.append(" (SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n" +
+                        "                                                    FROM movie_genres\n" +
+                        "                                                    GROUP BY movieID) select_genre, MOVIES mov\n");
+                cast1.append("WHERE select_genre.movieID = ma.movieID\n");
+                cast1.append("and ma.MOVIEID = mov.MOVIEID AND\n");
+                cast1.append("(");
+
+                director1.append("select distinct md.DIRECTORNAME from MOVIE_DIRECTORS md,\n");
+                director1.append(" (SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n" +
+                        "                                                    FROM movie_genres\n" +
+                        "                                                    GROUP BY movieID) select_genre, MOVIES mov\n");
+                director1.append("WHERE select_genre.movieID = md.movieID\n");
+                director1.append("and md.MOVIEID = mov.MOVIEID AND\n");
+                director1.append("(");
+
+
+                for (int i = 0; i < genreCheckList.size(); i++) {
+                    if (i == 0) {
+                        cast1.append("select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                        director1.append("select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                    } else {
+                        cast1.append(searchCondition).append(" select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                        director1.append(searchCondition).append(" select_genre.Genres LIKE '%").append(genreCheckList.get(i)).append("%'\n");
+                    }
+                }
+                cast1.append(")\n");
+                cast1.append("ORDER BY ma.ACTORNAME");
+                director1.append(")\n");
+                director1.append("ORDER BY md.DIRECTORNAME");
+
+            } else {
+                cast1.append("select distinct ma.ACTORNAME\n");
+                cast1.append("from MOVIE_ACTORS ma, MOVIES mov, MOVIE_COUNTRIES loc\n");
+                cast1.append("where mov.MOVIEID = loc.MOVIEID\n");
+                cast1.append("and mov.MOVIEID = ma.MOVIEID\n");
+                cast1.append("and loc.COUNTRY in (");
+                director1.append("select distinct md.DIRECTORNAME\n");
+                director1.append("from MOVIE_DIRECTORS md, MOVIES mov, MOVIE_COUNTRIES loc\n");
+                director1.append("where mov.MOVIEID = loc.MOVIEID\n");
+                director1.append("and mov.MOVIEID = md.MOVIEID\n");
+                director1.append("and loc.COUNTRY in (");
+                for (int i = 0; i < CountrycheckList.size(); i++) {
+                    if (i != CountrycheckList.size() - 1) {
+                        cast1.append("'").append(CountrycheckList.get(i)).append("',");
+                        director1.append("'").append(CountrycheckList.get(i)).append("',");
+                    } else {
+                        cast1.append("'").append(CountrycheckList.get(i)).append("'");
+                        director1.append("'").append(CountrycheckList.get(i)).append("'");
+                    }
+                }
+                cast1.append(")\n");
+                cast1.append("ORDER BY ma.ACTORNAME");
+                director1.append(")\n");
+                director1.append("ORDER BY md.DIRECTORNAME");
+
+            }
+            queryResult.append("\n");
+            queryResult.append("-----------------------------------------------------------\n");
+            queryResult.append(cast1.toString());
+
+            queryResult.append("\n");
+            queryResult.append("-----------------------------------------------------------\n");
+            queryResult.append(director1.toString());
+//            queryResult.setText(sb.toString());
+
+            try {
+                castRS = executeQuery(cast1.toString());
+                directorRS = executeQuery(director1.toString());
+                while (castRS.next()) {
+                    String castName = castRS.getString(1);
+                    if (!uniqueCast.containsKey(castName)) {
+                        castSearchCB1.addItem(castName);
+                        castSearchCB2.addItem(castName);
+                        castSearchCB3.addItem(castName);
+                        castSearchCB4.addItem(castName);
+                        uniqueCast.put(castName, 1);
+                    } else {
+                        continue;
+                    }
+                }
+                while (directorRS.next()) {
+                    String directorName = directorRS.getString(1);
+                    if (!uniqueCast.containsKey(directorName)) {
+                        directorSearchCB.addItem(directorName);
+                        uniqueCast.put(directorName, 1);
+                    } else {
+                        continue;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+//            removeCountryPanel();
+            castSearchCB1.removeAllItems();
+            castSearchCB2.removeAllItems();
+            castSearchCB3.removeAllItems();
+            castSearchCB4.removeAllItems();
+            directorSearchCB.removeAllItems();
+
+        }
+
+    }
+
+    private void performMovieQuery() {
+
+    }
+
     private void performLoadButton() {
         //getting the actual start and end year from table
         String queryForStartYear = "select * from (select mov.YEAR from MOVIES mov order by mov.YEAR asc) where ROWNUM <=1";
@@ -761,7 +904,19 @@ public class hw3 {
         selectedTags = new ArrayList<>();
         searchCondition = "OR";
         queryCondition = "AND";
+        tModel = new DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "#", "title", "genre", "year", "country",
+                        "filming locations", "AvgOfRating", "AvgOfReview"
+                }
+        );
+        queryResultTable.setModel(tModel);
         performLoadButton();
+
+        executeMovieQueryButton.addActionListener(e -> {
+            performMovieQuery();
+        });
         clearWindowsButton.addActionListener(e -> {
 //                removeGenrePanel();
             fromDatePicker.getModel().setYear(Integer.valueOf(actualStartYear));
@@ -774,9 +929,11 @@ public class hw3 {
             removeCountryPanel();
             removeTagPanel();
             removeAllText();
+            removeComboBox();
             tagWeightComboBox.setSelectedIndex(0);
             selectAndOrComboBox.setSelectedIndex(0);
         });
+
         selectAndOrComboBox.addActionListener(e -> {
             //System.out.println(selectAndOrComboBox.getSelectedItem());
             if (selectAndOrComboBox.getSelectedItem() == "AND" || selectAndOrComboBox.getSelectedItem() == "OR") {

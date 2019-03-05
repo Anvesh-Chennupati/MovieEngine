@@ -1,10 +1,16 @@
 <component name="ProjectDictionaryState">
   <dictionary name="anves">
     <words>
+      <w>actorname</w>
+      <w>countrycheck</w>
+      <w>directorname</w>
       <w>lable</w>
+      <w>listagg</w>
       <w>movieid</w>
       <w>movieyear</w>
       <w>mtag</w>
+      <w>qfey</w>
+      <w>qfsy</w>
       <w>searchbetween</w>
       <w>tagid</w>
       <w>tagpanel</w>
