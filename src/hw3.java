@@ -557,23 +557,6 @@ public class hw3 {
                 sb.append("ORDER BY country");
 
             }
-//            sb.append("SELECT DISTINCT country\n");
-//            sb.append("FROM movie_countries loc, ");
-//            sb.append("(");
-//            sb.append("SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
-//            sb.append("FROM movie_genres\n");
-//            sb.append("GROUP BY movieID) select_genre\n");
-//            sb.append("WHERE select_genre.movieID = loc.movieID AND ");
-//            sb.append("(");
-//            for (int i = 0; i < checkList.size(); i++) {
-//                if (i == 0) {
-//                    sb.append("select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
-//                } else {
-//                    sb.append(searchCondition + " select_genre.Genres LIKE '%" + checkList.get(i) + "%'\n");
-//                }
-//            }
-//            sb.append(")\n");
-//            sb.append("ORDER BY country");
             queryResult.setText(sb.toString());
             // connection DB and execute query command
             try {
