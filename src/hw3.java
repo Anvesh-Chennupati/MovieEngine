@@ -483,13 +483,6 @@ public class hw3 {
             if (!text.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(text);
                 cb.addActionListener(e -> {
-                    /*
-                    if (searchCondition == "OR") {
-                        loadAllFilmCountry();
-                    } else if (searchCondition == "AND") {
-                        loadFilmCountry();
-                    }
-                    */
                     loadTags();
                     populateCast_directorCB();
                 });
