@@ -937,8 +937,8 @@ public class hw3 {
         tModel = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "#", "title", "genre", "year", "country",
-                        "filming locations", "AvgOfRating", "AvgOfReview"
+                        "#", "Title", "Genre", "year", "Country",
+                        "Director Name"
                 }
         );
         queryResultTable.setModel(tModel);
