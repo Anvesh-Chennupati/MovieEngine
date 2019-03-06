@@ -428,10 +428,9 @@ public class hw3 {
                 defaultComboBoxModel6.addElement(tagweight);
                 tagValueComboBox.setModel(defaultComboBoxModel6);
                 uniqueWeight.put(tagweight, tagweight);
-            } else {
-                continue;
             }
 
+//            System.out.println(tagid + " " + tagtext + " " + tagweight);
             if (!tagid.equals(" ") && !tagtext.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(tagid + " " + tagtext);
                 cb.addActionListener(e -> {
@@ -455,6 +454,7 @@ public class hw3 {
 
     private void loadTags() {
         ArrayList<String> checkList = selectCheckBox(AttrType.Countries);
+        ArrayList<String> gcheckList = selectCheckBox(AttrType.Genres);
         ResultSet result;
 
         if (checkList.size() != 0) {
@@ -462,8 +462,12 @@ public class hw3 {
             // prepare query command
 
             sb.append("select distinct mtag.TAGID,tag.VALUE, mtag.TAGWEIGHT\n");
-            sb.append("from MOVIE_TAGS mtag, TAGS tag, MOVIE_COUNTRIES loc, MOVIES mov1\n");
+            sb.append("from MOVIE_TAGS mtag, TAGS tag, MOVIE_COUNTRIES loc, MOVIES mov1,\n");
+            sb.append("(SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n" +
+                    "FROM movie_genres\n" +
+                    "GROUP BY movieID) select_genre\n");
             sb.append("where mov1.MOVIEID = mtag.MOVIEID\n");
+            sb.append("and mov1.MOVIEID = select_genre.MOVIEID\n");
             sb.append("and mov1.MOVIEID = loc.MOVIEID\n");
             sb.append("and tag.TAGID = mtag.TAGID\n");
             sb.append("and loc.COUNTRY in (");
@@ -475,9 +479,20 @@ public class hw3 {
                 }
             }
             sb.append(")");
+            sb.append("AND");
+            sb.append("(");
+            for (int i = 0; i < gcheckList.size(); i++) {
+                if (i == 0) {
+                    sb.append("select_genre.Genres LIKE '%" + gcheckList.get(i) + "%'\n");
+                } else {
+                    sb.append(searchCondition + " select_genre.Genres LIKE '%" + gcheckList.get(i) + "%'\n");
+                }
+            }
+            sb.append(")\n");
             queryResult.setText(sb.toString());
             // connection DB and execute query command
             try {
+//                System.out.println(sb.toString());
                 result = executeQuery(sb.toString());
                 updateTagPanel(result);
             } catch (SQLException e) {
@@ -815,13 +830,14 @@ public class hw3 {
 
     }
 
-    private String createCollectiveQuery(){
+    private String createCollectiveQuery() {
         String query = null;
         ArrayList<String> sGenre = selectCheckBox(AttrType.Genres);
         ArrayList<String> sCountry = selectCheckBox(AttrType.Countries);
         ArrayList<String> sTags = selectCheckBox(AttrType.Tags);
         return query;
     }
+
     private void performMovieQuery() {
 
         //getting all the checkbox selections ,combobox selections to perform movie query
@@ -831,9 +847,9 @@ public class hw3 {
         int numofCol = 0;
         int numofRow = 1;
 
-        try{
+        try {
             query = createCollectiveQuery();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             closeConnect();
