@@ -63,6 +63,7 @@ public class hw3 {
     private JLabel tagWeightLabel;
     private JLabel TagValueLabel;
     private JTable queryResultTable;
+    private JScrollPane queryResultScrollPane;
 
 
     //global variables
@@ -298,8 +299,10 @@ public class hw3 {
         QueryResultPanel = new JPanel();
         QueryResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         bottomPanel.add(QueryResultPanel, new GridConstraints(0, 0, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        queryResultScrollPane = new JScrollPane();
+        QueryResultPanel.add(queryResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         queryResult = new JTextArea();
-        QueryResultPanel.add(queryResult, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        queryResultScrollPane.setViewportView(queryResult);
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
         bottomPanel.add(buttonPanel, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -802,6 +805,12 @@ public class hw3 {
             try {
                 castRS = executeQuery(cast1.toString());
                 directorRS = executeQuery(director1.toString());
+                castSearchCB1.addItem("Choose Actor/Actress");
+                castSearchCB2.addItem("Choose Actor/Actress");
+                castSearchCB3.addItem("Choose Actor/Actress");
+                castSearchCB4.addItem("Choose Actor/Actress");
+                directorSearchCB.addItem("Choose Director");
+
                 while (castRS.next()) {
                     String castName = castRS.getString(1);
                     if (!uniqueCast.containsKey(castName)) {
@@ -831,11 +840,84 @@ public class hw3 {
     }
 
     private String createCollectiveQuery() {
-        String query = null;
         ArrayList<String> sGenre = selectCheckBox(AttrType.Genres);
         ArrayList<String> sCountry = selectCheckBox(AttrType.Countries);
         ArrayList<String> sTags = selectCheckBox(AttrType.Tags);
-        return query;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("select distinct mov.TITLE, mg.Genres, mov.YEAR, moc.COUNTRY,md.DIRECTORNAME\n");
+        sb.append("from MOVIES mov, MOVIE_COUNTRIES moc, MOVIE_ACTORS ma, MOVIE_DIRECTORS md,\n");
+        sb.append("(SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
+        sb.append("\t\t\t\t\t\tFROM movie_genres\n");
+        sb.append("\t\t\t\t\t\tGROUP BY movieID) mg,\n");
+        sb.append("MOVIE_TAGS mt\n");
+        sb.append("where mov.MOVIEID = moc.MOVIEID\n" +
+                "  and mov.MOVIEID = ma.MOVIEID\n" +
+                "  and mov.MOVIEID = md.MOVIEID\n" +
+                "  and mov.MOVIEID = mg.MOVIEID\n" +
+                "  and mov.MOVIEID = mt.MOVIEID\n");
+        sb.append("AND");
+        sb.append("(");
+        for (int i = 0; i < sGenre.size(); i++) {
+            if (i == 0) {
+                sb.append("mg.Genres LIKE '%" + sGenre.get(i) + "%'\n");
+            } else {
+                sb.append(searchCondition + " mg.Genres LIKE '%" + sGenre.get(i) + "%'\n");
+            }
+        }
+        sb.append(")\n");
+        sb.append("and moc.COUNTRY in (");
+        for (int i = 0; i < sCountry.size(); i++) {
+            if (!(i == sCountry.size() - 1)) {
+                sb.append("'").append(sCountry.get(i)).append("', ");
+            } else {
+                sb.append("'").append(sCountry.get(i)).append("')\n");
+            }
+        }
+        boolean castset1 = castset(castSearchCB1);
+        boolean castset2 = castset(castSearchCB2);
+        boolean castset3 = castset(castSearchCB3);
+        boolean castset4 = castset(castSearchCB4);
+        boolean direcset = directorset(directorSearchCB);
+//        if(castSearchCB1.getItemCount()!=0 && !castSearchCB1.getSelectedItem().toString().equals("Choose Actor/Actress")){
+//            castset1 = true;
+//        }
+        StringBuilder movieActor = new StringBuilder();
+        movieActor.append(" ");
+        if (castset1 || castset2 || castset3 || castset4) {
+            movieActor.append("and ma.ACTORNAME in (");
+            if (castset1) movieActor.append("'").append(castSearchCB1.getSelectedItem().toString()).append("',");
+            if (castset2) movieActor.append("'").append(castSearchCB2.getSelectedItem().toString()).append("',");
+            if (castset3) movieActor.append("'").append(castSearchCB3.getSelectedItem().toString()).append("',");
+            if (castset4) movieActor.append("'").append(castSearchCB4.getSelectedItem().toString()).append("',");
+            movieActor.append(")");
+            movieActor.setCharAt(movieActor.length() - 2, ' ');
+        }
+        sb.append(movieActor.toString());
+
+        if (direcset) {
+            sb.append(" and md.DIRECTORNAME = '" + directorSearchCB.getSelectedItem().toString() + "'\n");
+        }
+
+        //adding selected tag ids
+
+        if (selectedTags.size() != 0) {
+
+        }
+
+        if (tagValueComboBox.getItemCount() != 0) {
+            if (!tagWeightComboBox.getSelectedItem().toString().equals("=,<,>,>=,<=")) {
+                sb.append(" and mt.TAGWEIGHT " + tagWeightComboBox.getSelectedItem().toString() + " " + tagValueComboBox.getSelectedItem().toString());
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean castset(JComboBox<String> jb) {
+        return jb.getItemCount() != 0 && !jb.getSelectedItem().toString().equals("Choose Actor/Actress");
+    }
+    private boolean directorset(JComboBox<String> jb) {
+        return jb.getItemCount() != 0 && !jb.getSelectedItem().toString().equals("Choose Director");
     }
 
     private void performMovieQuery() {
@@ -843,12 +925,15 @@ public class hw3 {
         //getting all the checkbox selections ,combobox selections to perform movie query
         ResultSet result;
         ResultSetMetaData metaresult;
-        String query = null;
+        String query;
         int numofCol = 0;
         int numofRow = 1;
 
         try {
             query = createCollectiveQuery();
+            System.out.println(query);
+            result = executeQuery(query);
+            metaresult = result.getMetaData();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -946,6 +1031,14 @@ public class hw3 {
 
         executeMovieQueryButton.addActionListener(e -> performMovieQuery());
         clearWindowsButton.addActionListener(e -> {
+            //removing button colors
+            castSearchButton1.setBackground(Color.white);
+            castSearchButton2.setBackground(Color.white);
+            castSearchButton3.setBackground(Color.white);
+            castSearchButton4.setBackground(Color.white);
+            directorSearchButton.setBackground(Color.white);
+
+
 //                removeGenrePanel();
             fromDatePicker.getModel().setYear(Integer.valueOf(actualStartYear));
             fromDatePicker.getModel().setMonth(0);
@@ -958,6 +1051,12 @@ public class hw3 {
             removeTagPanel();
             removeAllText();
             removeComboBox();
+            //resetting cast field
+            castSearchCB1.addItem("Choose Actor/Actress");
+            castSearchCB2.addItem("Choose Actor/Actress");
+            castSearchCB3.addItem("Choose Actor/Actress");
+            castSearchCB4.addItem("Choose Actor/Actress");
+            directorSearchCB.addItem("Choose Director");
             tagWeightComboBox.setSelectedIndex(0);
             selectAndOrComboBox.setSelectedIndex(0);
         });
@@ -985,6 +1084,7 @@ public class hw3 {
         castSearchButton1.addActionListener(e -> {
             if (!(castSearchCB1.getItemCount() < 1)) {
                 selectedCast1 = Objects.requireNonNull(castSearchCB1.getSelectedItem()).toString();
+                castSearchButton1.setBackground(Color.green);
                 System.out.println(selectedCast1);
             }
         });
@@ -992,18 +1092,21 @@ public class hw3 {
             if (!(castSearchCB2.getItemCount() < 1)) {
                 selectedCast2 = Objects.requireNonNull(castSearchCB2.getSelectedItem()).toString();
                 System.out.println(selectedCast2);
+                castSearchButton2.setBackground(Color.green);
             }
         });
         castSearchButton3.addActionListener(e -> {
             if (!(castSearchCB3.getItemCount() < 1)) {
                 selectedCast3 = Objects.requireNonNull(castSearchCB3.getSelectedItem()).toString();
                 System.out.println(selectedCast3);
+                castSearchButton3.setBackground(Color.green);
             }
         });
         castSearchButton4.addActionListener(e -> {
             if (!(castSearchCB4.getItemCount() < 1)) {
                 selectedCast4 = Objects.requireNonNull(castSearchCB4.getSelectedItem()).toString();
                 System.out.println(selectedCast4);
+                castSearchButton4.setBackground(Color.green);
             }
         });
         directorSearchButton.addActionListener(e -> {

@@ -2,6 +2,7 @@
   <dictionary name="anves">
     <words>
       <w>actorname</w>
+      <w>castset</w>
       <w>countrycheck</w>
       <w>directorname</w>
       <w>lable</w>
