@@ -64,6 +64,7 @@ public class hw3 {
     private JLabel TagValueLabel;
     private JTable queryResultTable;
     private JScrollPane queryResultScrollPane;
+    private JTable userResultTable;
 
 
     //global variables
@@ -296,6 +297,8 @@ public class hw3 {
         bottomPanel.add(userResultPanel, new GridConstraints(0, 1, 5, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         userResultScrollPane = new JScrollPane();
         userResultPanel.add(userResultScrollPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        userResultTable = new JTable();
+        userResultScrollPane.setViewportView(userResultTable);
         QueryResultPanel = new JPanel();
         QueryResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         bottomPanel.add(QueryResultPanel, new GridConstraints(0, 0, 4, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -916,6 +919,7 @@ public class hw3 {
     private boolean castset(JComboBox<String> jb) {
         return jb.getItemCount() != 0 && !jb.getSelectedItem().toString().equals("Choose Actor/Actress");
     }
+
     private boolean directorset(JComboBox<String> jb) {
         return jb.getItemCount() != 0 && !jb.getSelectedItem().toString().equals("Choose Director");
     }
@@ -957,7 +961,6 @@ public class hw3 {
             if (numofRow == 1) {
                 JOptionPane.showMessageDialog(null, "No data found in DB based on the query conditions");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -1149,6 +1152,9 @@ public class hw3 {
                 directorSearchButton.setBackground(Color.green);
             }
         });
+        executeUserQueryButton.addActionListener(e ->
+                System.out.println(queryResultTable.getSelectedRowCount()));
+        System.out.println(queryResultTable.getSelectedRow());
     }
 
     private void startQueryEngine() {
