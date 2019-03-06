@@ -83,11 +83,14 @@ public class hw3 {
     private String selectedCast3 = "";
     private String selectedCast4 = "";
     private String selecteddirector = "";
+    private String selectedTagWeight = "";
+    private String selectedTagValue = "";
 
 
     public enum AttrType {
         Genres,
-        Countries
+        Countries,
+        Tags
     }
 
     {
@@ -401,6 +404,8 @@ public class hw3 {
             typeList = selectedGenres;
         } else if (type.equals(AttrType.Countries)) {
             typeList = selectedCountries;
+        } else if (type.equals(AttrType.Tags)) {
+            typeList = selectedTags;
         }
         for (JCheckBox cb : typeList) {
             if (cb.isSelected()) {
@@ -812,7 +817,30 @@ public class hw3 {
 
     private void performMovieQuery() {
         removeAllText();
+        //getting all the checkbox selections ,combobox selections to perform movie query
+        ArrayList<String> sGenre = selectCheckBox(AttrType.Genres);
+        ArrayList<String> sCountry = selectCheckBox(AttrType.Countries);
+        ArrayList<String> sTags = selectCheckBox(AttrType.Tags);
 
+        System.out.println("Selected Genres");
+        for (String s : sGenre) System.out.println(s);
+
+        System.out.println("Selected Country");
+        for (String s : sCountry) System.out.println(s);
+
+        System.out.println("Selected Tags");
+        for (String s : sTags) System.out.println(s);
+
+        System.out.println("Selected Tag Weight");
+        selectedTagWeight = Objects.requireNonNull(tagWeightComboBox.getSelectedItem()).toString();
+        if (!selectedTagWeight.equals("=,<,>,>=,<=")) {
+            System.out.println(selectedTagWeight);
+        }
+
+        System.out.println("Selected Tag Value");
+        if (!(tagValueComboBox.getItemCount() < 1)) {
+            System.out.println(Objects.requireNonNull(tagValueComboBox.getSelectedItem()).toString());
+        }
     }
 
     private void performLoadButton() {
