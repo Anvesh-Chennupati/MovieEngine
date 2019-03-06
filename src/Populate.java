@@ -11,8 +11,8 @@ import java.util.TimeZone;
 
 
 public class Populate {
-    File folder = new File("dat_files");
-    File[] listOfFiles = folder.listFiles();
+    private File folder = new File("dat_files");
+    private File[] listOfFiles = folder.listFiles();
 
     public static void main(String[] args) {
         Populate gen = new Populate();
@@ -54,7 +54,7 @@ public class Populate {
 //        }
 //    }
 
-    public void execute() {
+    private void execute() {
         Connection conn = null;
         try {
             // build connect
@@ -67,10 +67,10 @@ public class Populate {
             publishData(conn, "dat_files/tags.dat");
 
 
-            for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].isFile()) {
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
 //                    System.out.println("File " + listOfFiles[i].getName());
-                    String temp = listOfFiles[i].getName();
+                    String temp = listOfFile.getName();
                     if (temp.trim().contains("user")) {
                         publishUserData(conn, "dat_files/" + temp);
                     } else {
@@ -95,6 +95,7 @@ public class Populate {
         } catch (IOException io) {
             io.printStackTrace();
         } finally {
+            assert conn != null;
             closeConnect(conn);
         }
     }
