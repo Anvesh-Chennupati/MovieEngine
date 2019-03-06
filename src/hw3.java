@@ -929,11 +929,35 @@ public class hw3 {
         int numofCol = 0;
         int numofRow = 1;
 
+        tModel = new DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "#", "Title", "Genre", "year", "Country",
+                        "Director Name"
+                }
+        );
+        queryResultTable.setModel(tModel);
+
         try {
             query = createCollectiveQuery();
             System.out.println(query);
             result = executeQuery(query);
             metaresult = result.getMetaData();
+            numofCol = metaresult.getColumnCount();
+            System.out.println("Fetching data from DB server ....");
+            while (result.next()) {
+                Object[] objects = new Object[numofCol + 1];
+                objects[0] = numofRow;
+                for (int i = 1; i <= numofCol; i++) {
+                    objects[i] = result.getObject(i);
+                }
+                numofRow++;
+                tModel.addRow(objects);
+            }
+            if (numofRow == 1) {
+                JOptionPane.showMessageDialog(null, "No data found in DB based on the query conditions");
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -1031,6 +1055,15 @@ public class hw3 {
 
         executeMovieQueryButton.addActionListener(e -> performMovieQuery());
         clearWindowsButton.addActionListener(e -> {
+            //clearing result fields
+            tModel = new DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{
+                            "#", "Title", "Genre", "year", "Country",
+                            "Director Name"
+                    }
+            );
+            queryResultTable.setModel(tModel);
             //removing button colors
             castSearchButton1.setBackground(Color.white);
             castSearchButton2.setBackground(Color.white);
@@ -1113,6 +1146,7 @@ public class hw3 {
             if (!(directorSearchCB.getItemCount() < 1)) {
                 selecteddirector = Objects.requireNonNull(directorSearchCB.getSelectedItem()).toString();
                 System.out.println(selecteddirector);
+                directorSearchButton.setBackground(Color.green);
             }
         });
     }
