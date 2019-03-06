@@ -5,9 +5,12 @@ import org.jdatepicker.JDatePicker;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class hw3 {
     private JPanel MainPanel;
@@ -75,6 +78,12 @@ public class hw3 {
     private Integer selectedMovieTo = 2999;
     private String actualStartYear = "";
     private String actualEndYear = "";
+    private String selectedCast1 = "";
+    private String selectedCast2 = "";
+    private String selectedCast3 = "";
+    private String selectedCast4 = "";
+    private String selecteddirector = "";
+
 
     public enum AttrType {
         Genres,
@@ -192,7 +201,7 @@ public class hw3 {
         directorLabel.setText("Director");
         topPanel.add(directorLabel, new GridConstraints(6, 3, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         directorSearchButton = new JButton();
-        directorSearchButton.setText("Search");
+        directorSearchButton.setText("select");
         topPanel.add(directorSearchButton, new GridConstraints(7, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         genreLabel = new JLabel();
         Font genreLabelFont = this.$$$getFont$$$(null, Font.BOLD, 16, genreLabel.getFont());
@@ -248,16 +257,16 @@ public class hw3 {
         toDatePicker = new JDatePicker();
         topPanel.add(toDatePicker, new GridConstraints(8, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         castSearchButton1 = new JButton();
-        castSearchButton1.setText("Search");
+        castSearchButton1.setText("select");
         topPanel.add(castSearchButton1, new GridConstraints(2, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         castSearchButton4 = new JButton();
-        castSearchButton4.setText("Search");
+        castSearchButton4.setText("select");
         topPanel.add(castSearchButton4, new GridConstraints(5, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         castSearchButton2 = new JButton();
-        castSearchButton2.setText("Search");
+        castSearchButton2.setText("Select");
         topPanel.add(castSearchButton2, new GridConstraints(3, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         castSearchButton3 = new JButton();
-        castSearchButton3.setText("Search");
+        castSearchButton3.setText("select");
         topPanel.add(castSearchButton3, new GridConstraints(4, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         directorSearchCB = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel7 = new DefaultComboBoxModel();
@@ -304,6 +313,7 @@ public class hw3 {
     }
 
     /**
+     * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
         if (currentFont == null) return null;
@@ -801,6 +811,7 @@ public class hw3 {
     }
 
     private void performMovieQuery() {
+        removeAllText();
 
     }
 
@@ -908,6 +919,36 @@ public class hw3 {
             selectedMovieTo = toDatePicker.getModel().getYear();
             System.out.println(selectedMovieTo);
             loadCountry();
+        });
+        castSearchButton1.addActionListener(e -> {
+            if (!(castSearchCB1.getItemCount() < 1)) {
+                selectedCast1 = Objects.requireNonNull(castSearchCB1.getSelectedItem()).toString();
+                System.out.println(selectedCast1);
+            }
+        });
+        castSearchButton2.addActionListener(e -> {
+            if (!(castSearchCB2.getItemCount() < 1)) {
+                selectedCast2 = Objects.requireNonNull(castSearchCB2.getSelectedItem()).toString();
+                System.out.println(selectedCast2);
+            }
+        });
+        castSearchButton3.addActionListener(e -> {
+            if (!(castSearchCB3.getItemCount() < 1)) {
+                selectedCast3 = Objects.requireNonNull(castSearchCB3.getSelectedItem()).toString();
+                System.out.println(selectedCast3);
+            }
+        });
+        castSearchButton4.addActionListener(e -> {
+            if (!(castSearchCB4.getItemCount() < 1)) {
+                selectedCast4 = Objects.requireNonNull(castSearchCB4.getSelectedItem()).toString();
+                System.out.println(selectedCast4);
+            }
+        });
+        directorSearchButton.addActionListener(e -> {
+            if (!(directorSearchCB.getItemCount() < 1)) {
+                selecteddirector = Objects.requireNonNull(directorSearchCB.getSelectedItem()).toString();
+                System.out.println(selecteddirector);
+            }
         });
     }
 
