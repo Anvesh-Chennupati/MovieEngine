@@ -859,7 +859,9 @@ public class hw3 {
         sb.append("  and mov.MOVIEID = ma.MOVIEID\n");
         sb.append("  and mov.MOVIEID = md.MOVIEID\n");
         sb.append("  and mov.MOVIEID = mg.MOVIEID\n");
-//                "  and mov.MOVIEID = mt.MOVIEID\n");
+        if (!(tagPanel.getComponentCount() == 0)) {
+            sb.append("and mov.MOVIEID = mt.MOVIEID\n");
+        }
         sb.append("AND");
         sb.append("(");
         for (int i = 0; i < sGenre.size(); i++) {
