@@ -4,6 +4,7 @@ import oracle.jdbc.OracleDriver;
 import org.jdatepicker.JDatePicker;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -854,11 +855,11 @@ public class hw3 {
         sb.append("\t\t\t\t\t\tFROM movie_genres\n");
         sb.append("\t\t\t\t\t\tGROUP BY movieID) mg,\n");
         sb.append("MOVIE_TAGS mt\n");
-        sb.append("where mov.MOVIEID = moc.MOVIEID\n" +
-                "  and mov.MOVIEID = ma.MOVIEID\n" +
-                "  and mov.MOVIEID = md.MOVIEID\n" +
-                "  and mov.MOVIEID = mg.MOVIEID\n" +
-                "  and mov.MOVIEID = mt.MOVIEID\n");
+        sb.append("where mov.MOVIEID = moc.MOVIEID\n");
+        sb.append("  and mov.MOVIEID = ma.MOVIEID\n");
+        sb.append("  and mov.MOVIEID = md.MOVIEID\n");
+        sb.append("  and mov.MOVIEID = mg.MOVIEID\n");
+//                "  and mov.MOVIEID = mt.MOVIEID\n");
         sb.append("AND");
         sb.append("(");
         for (int i = 0; i < sGenre.size(); i++) {
@@ -936,12 +937,14 @@ public class hw3 {
         tModel = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "#", "Title", "Genre", "year", "Country",
+                        "Selection", "Title", "Genre", "year", "Country",
                         "Director Name"
                 }
         );
         queryResultTable.setModel(tModel);
-
+        TableColumn tc = queryResultTable.getColumnModel().getColumn(0);
+        tc.setCellEditor(queryResultTable.getDefaultEditor(Boolean.class));
+        tc.setCellRenderer(queryResultTable.getDefaultRenderer(Boolean.class));
         try {
             query = createCollectiveQuery();
             System.out.println(query);
@@ -951,7 +954,7 @@ public class hw3 {
             System.out.println("Fetching data from DB server ....");
             while (result.next()) {
                 Object[] objects = new Object[numofCol + 1];
-                objects[0] = numofRow;
+                objects[0] = new Boolean(false);
                 for (int i = 1; i <= numofCol; i++) {
                     objects[i] = result.getObject(i);
                 }
