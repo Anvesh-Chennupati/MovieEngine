@@ -911,6 +911,7 @@ public class hw3 {
 
         }
 
+        //fixing the tag panel logic when Tag panel isnt available
         if (tagValueComboBox.getItemCount() != 0) {
             if (!tagWeightComboBox.getSelectedItem().toString().equals("=,<,>,>=,<=")) {
                 sb.append(" and mt.TAGWEIGHT " + tagWeightComboBox.getSelectedItem().toString() + " " + tagValueComboBox.getSelectedItem().toString());
