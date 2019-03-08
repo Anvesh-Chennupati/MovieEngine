@@ -913,9 +913,22 @@ public class hw3 {
 
         //fixing the tag panel logic when Tag panel isnt available
         if (tagValueComboBox.getItemCount() != 0) {
+            System.out.println(sTags.size());
             if (!tagWeightComboBox.getSelectedItem().toString().equals("=,<,>,>=,<=")) {
                 sb.append(" and mt.TAGWEIGHT " + tagWeightComboBox.getSelectedItem().toString() + " " + tagValueComboBox.getSelectedItem().toString());
             }
+        }
+
+        if (sTags.size() != 0) {
+            sb.append(" and ");
+            sb.append("mt.TAGID in (");
+            StringBuilder tempTags = new StringBuilder();
+            for (int i = 0; i < sTags.size(); i++) {
+                tempTags.append("'" + Integer.parseInt(sTags.get(i).replaceAll("[\\D]", "")) + "',");
+            }
+            tempTags.setCharAt(tempTags.length() - 1, ' ');
+            tempTags.append(")");
+            sb.append(tempTags.toString());
         }
         return sb.toString();
     }
