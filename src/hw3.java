@@ -89,6 +89,8 @@ public class hw3 {
     private String selecteddirector = "";
     private String selectedTagWeight = "";
     private String selectedTagValue = "";
+    private HashMap<Integer, Integer> selectedMoviesFromQuery = new HashMap<>();
+    private int[] selectedRowsFromMovieResult;
 
 
     public enum AttrType {
@@ -292,7 +294,7 @@ public class hw3 {
         topPanel.add(tagValueComboBox, new GridConstraints(9, 7, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
-        MainPanel.add(bottomPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        MainPanel.add(bottomPanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));
         bottomPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(new Color(-16777216)), null));
         userResultPanel = new JPanel();
         userResultPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
@@ -855,7 +857,7 @@ public class hw3 {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("select distinct mov.TITLE, mg.Genres, mov.YEAR, moc.COUNTRY,md.DIRECTORNAME\n");
+        sb.append("select distinct mov.MOVIEID, mov.TITLE, mg.Genres, mov.YEAR, moc.COUNTRY,md.DIRECTORNAME\n");
         sb.append("from MOVIES mov, MOVIE_COUNTRIES moc, MOVIE_ACTORS ma, MOVIE_DIRECTORS md,\n");
         sb.append("(SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
         sb.append("\t\t\t\t\t\tFROM movie_genres\n");
@@ -957,7 +959,49 @@ public class hw3 {
     }
 
     private void performUserQuery() {
+        uModel = new DefaultTableModel();
+        uModel = new DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "#",
+                        "User ID"
+                }
+        );
+        userResultTable.setModel(uModel);
         StringBuilder uquery = new StringBuilder();
+        if (queryResultTable.getSelectedRowCount() == 0) {
+            JOptionPane.showMessageDialog(null, "Please select rows from Movie Results first");
+        } else {
+            selectedRowsFromMovieResult = queryResultTable.getSelectedRows();
+//            for (int i1 : selectedRowsFromMovieResult) {
+//                System.out.println(i1);
+//            }
+            uquery.append("select  distinct utm.USERID from USER_TAGGEDMOVIES utm \n");
+            uquery.append("where utm.MOVIEID in (");
+            for (int i1 : selectedRowsFromMovieResult) {
+                uquery.append("'" + selectedMoviesFromQuery.get(i1).toString() + "',");
+            }
+            uquery.setCharAt(uquery.length() - 1, ' ');
+            uquery.append(")");
+            System.out.println(uquery);
+            ResultSet uresult;
+            uresult = executeQuery(uquery.toString());
+            int numRow = 1;
+            try {
+                while (uresult.next()) {
+                    Object[] objects = new Object[2];
+                    objects[0] = numRow;
+                    objects[1] = uresult.getObject(1);
+                    uModel.addRow(objects);
+                    numRow++;
+                }
+                if (numRow == 1) {
+                    JOptionPane.showMessageDialog(null, "No user has tagged this movie");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void performMovieQuery() {
@@ -972,14 +1016,14 @@ public class hw3 {
         tModel = new DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                        "Selection", "Title", "Genre", "year", "Country",
+                        "#", "MovieID", "Title", "Genre", "year", "Country",
                         "Director Name"
                 }
         );
         queryResultTable.setModel(tModel);
-        TableColumn tc = queryResultTable.getColumnModel().getColumn(0);
-        tc.setCellEditor(queryResultTable.getDefaultEditor(Boolean.class));
-        tc.setCellRenderer(queryResultTable.getDefaultRenderer(Boolean.class));
+//        TableColumn tc = queryResultTable.getColumnModel().getColumn(0);
+//        tc.setCellEditor(queryResultTable.getDefaultEditor(Boolean.class));
+//        tc.setCellRenderer(queryResultTable.getDefaultRenderer(Boolean.class));
         try {
             query = createCollectiveQuery();
             System.out.println(query);
@@ -990,8 +1034,11 @@ public class hw3 {
                 System.out.println("Fetching data from DB server ....");
                 while (result.next()) {
                     Object[] objects = new Object[numofCol + 1];
-                    objects[0] = Boolean.FALSE;
+//                    objects[0] = Boolean.FALSE;
+                    objects[0] = numofRow;
                     for (int i = 1; i <= numofCol; i++) {
+                        if (i == 1)
+                            selectedMoviesFromQuery.put(numofRow - 1, Integer.valueOf(result.getObject(1).toString()));
                         objects[i] = result.getObject(i);
                     }
                     numofRow++;
@@ -1246,8 +1293,7 @@ public class hw3 {
             }
         });
         executeUserQueryButton.addActionListener(e -> {
-                    System.out.println(queryResultTable.getSelectedRowCount());
-                    performUserQuery();
+            performUserQuery();
                 }
         );
     }
