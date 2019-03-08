@@ -1061,6 +1061,7 @@ public class hw3 {
 
 
     private hw3() {
+        final boolean[] clicked = {false, false, false, false, false};
         conn = null;
         selectedGenres = new ArrayList<>();
         selectedCountries = new ArrayList<>();
@@ -1141,38 +1142,70 @@ public class hw3 {
         });
         castSearchButton1.addActionListener(e -> {
             //to toggle button colors
-            if (!(castSearchCB1.getItemCount() < 1)) {
+
+            if (!(castSearchCB1.getItemCount() < 1) && !clicked[0]) {
                 selectedCast1 = Objects.requireNonNull(castSearchCB1.getSelectedItem()).toString();
                 castSearchButton1.setBackground(Color.green);
                 System.out.println(selectedCast1);
+                clicked[0] = true;
+            } else {
+                castSearchButton1.setBackground(Color.white);
+                selectedCast1 = "Choose Actor/Actress";
+                castSearchCB1.setSelectedIndex(0);
+                clicked[0] = false;
             }
         });
         castSearchButton2.addActionListener(e -> {
-            if (!(castSearchCB2.getItemCount() < 1)) {
+            if (!(castSearchCB2.getItemCount() < 1) && !clicked[1]) {
                 selectedCast2 = Objects.requireNonNull(castSearchCB2.getSelectedItem()).toString();
                 System.out.println(selectedCast2);
                 castSearchButton2.setBackground(Color.green);
+                clicked[1] = true;
+            } else {
+                castSearchButton2.setBackground(Color.white);
+                selectedCast2 = "Choose Actor/Actress";
+                castSearchCB2.setSelectedIndex(0);
+                clicked[1] = false;
             }
+
         });
         castSearchButton3.addActionListener(e -> {
-            if (!(castSearchCB3.getItemCount() < 1)) {
+            if (!(castSearchCB3.getItemCount() < 1) && !clicked[2]) {
                 selectedCast3 = Objects.requireNonNull(castSearchCB3.getSelectedItem()).toString();
                 System.out.println(selectedCast3);
                 castSearchButton3.setBackground(Color.green);
+                clicked[2] = true;
+            } else {
+                castSearchButton3.setBackground(Color.white);
+                selectedCast3 = "Choose Actor/Actress";
+                castSearchCB3.setSelectedIndex(0);
+                clicked[2] = false;
             }
         });
         castSearchButton4.addActionListener(e -> {
-            if (!(castSearchCB4.getItemCount() < 1)) {
+            if (!(castSearchCB4.getItemCount() < 1) && !clicked[3]) {
                 selectedCast4 = Objects.requireNonNull(castSearchCB4.getSelectedItem()).toString();
                 System.out.println(selectedCast4);
                 castSearchButton4.setBackground(Color.green);
+                clicked[3] = true;
+            } else {
+                castSearchButton4.setBackground(Color.white);
+                selectedCast4 = "Choose Actor/Actress";
+                castSearchCB4.setSelectedIndex(0);
+                clicked[3] = false;
             }
         });
         directorSearchButton.addActionListener(e -> {
-            if (!(directorSearchCB.getItemCount() < 1)) {
+            if (!(directorSearchCB.getItemCount() < 1) && !clicked[4]) {
                 selecteddirector = Objects.requireNonNull(directorSearchCB.getSelectedItem()).toString();
                 System.out.println(selecteddirector);
                 directorSearchButton.setBackground(Color.green);
+                clicked[4] = true;
+            } else {
+                directorSearchButton.setBackground(Color.white);
+                selecteddirector = "Choose Actor/Actress";
+                directorSearchCB.setSelectedIndex(0);
+                clicked[4] = false;
             }
         });
         executeUserQueryButton.addActionListener(e ->
