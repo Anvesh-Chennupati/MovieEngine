@@ -859,13 +859,15 @@ public class hw3 {
         sb.append("from MOVIES mov, MOVIE_COUNTRIES moc, MOVIE_ACTORS ma, MOVIE_DIRECTORS md,\n");
         sb.append("(SELECT movieID, LISTAGG(genre, ',') WITHIN GROUP (ORDER BY genre) AS Genres\n");
         sb.append("\t\t\t\t\t\tFROM movie_genres\n");
-        sb.append("\t\t\t\t\t\tGROUP BY movieID) mg,\n");
-        sb.append("MOVIE_TAGS mt\n");
+        sb.append("\t\t\t\t\t\tGROUP BY movieID) mg\n");
+        if (!(tagPanel.getComponentCount() == 0 || sTags.size() == 0)) {
+            sb.append(",MOVIE_TAGS mt\n");
+        }
         sb.append("where mov.MOVIEID = moc.MOVIEID\n");
         sb.append("  and mov.MOVIEID = ma.MOVIEID\n");
         sb.append("  and mov.MOVIEID = md.MOVIEID\n");
         sb.append("  and mov.MOVIEID = mg.MOVIEID\n");
-        if (!(tagPanel.getComponentCount() == 0)) {
+        if (!(tagPanel.getComponentCount() == 0 || sTags.size() == 0)) {
             sb.append("and mov.MOVIEID = mt.MOVIEID\n");
         }
         sb.append("AND");
