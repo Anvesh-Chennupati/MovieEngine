@@ -5,11 +5,14 @@
       <w>castset</w>
       <w>countrycheck</w>
       <w>directorname</w>
+      <w>directorset</w>
       <w>lable</w>
       <w>listagg</w>
+      <w>metaresult</w>
       <w>movieid</w>
       <w>movieyear</w>
       <w>mtag</w>
+      <w>numof</w>
       <w>qfey</w>
       <w>qfsy</w>
       <w>searchbetween</w>
