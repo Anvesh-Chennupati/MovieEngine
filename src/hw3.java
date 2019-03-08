@@ -77,6 +77,7 @@ public class hw3 {
     private String queryCondition;
     private Connection conn;
     private DefaultTableModel tModel;
+    private DefaultTableModel uModel;
     private Integer selectedMovieFrom = 1600;
     private Integer selectedMovieTo = 2999;
     private String actualStartYear = "";
@@ -948,6 +949,18 @@ public class hw3 {
         return jb.getItemCount() != 0 && !jb.getSelectedItem().toString().equals("Choose Director");
     }
 
+    private void performUserQuery() {
+        uModel = new DefaultTableModel();
+        uModel = new DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "User ID"
+                }
+        );
+        userResultTable.setModel(uModel);
+
+    }
+
     private void performMovieQuery() {
 
         //getting all the checkbox selections ,combobox selections to perform movie query
@@ -1212,9 +1225,11 @@ public class hw3 {
                 clicked[4] = false;
             }
         });
-        executeUserQueryButton.addActionListener(e ->
-                System.out.println(queryResultTable.getSelectedRowCount()));
-        System.out.println(queryResultTable.getSelectedRow());
+        executeUserQueryButton.addActionListener(e -> {
+                    System.out.println(queryResultTable.getSelectedRowCount());
+                    performUserQuery();
+                }
+        );
     }
 
     private void startQueryEngine() {
