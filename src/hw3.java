@@ -872,6 +872,10 @@ public class hw3 {
             }
         }
         sb.append(")\n");
+
+        if (sCountry.size() == 0) {
+            return sb.toString();
+        }
         sb.append("and moc.COUNTRY in (");
         for (int i = 0; i < sCountry.size(); i++) {
             if (!(i == sCountry.size() - 1)) {
