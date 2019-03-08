@@ -849,6 +849,11 @@ public class hw3 {
         ArrayList<String> sCountry = selectCheckBox(AttrType.Countries);
         ArrayList<String> sTags = selectCheckBox(AttrType.Tags);
 
+        if (sGenre.size() == 0) {
+            JOptionPane.showMessageDialog(null, "Please select at least one Genre and Country");
+            return " ";
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("select distinct mov.TITLE, mg.Genres, mov.YEAR, moc.COUNTRY,md.DIRECTORNAME\n");
         sb.append("from MOVIES mov, MOVIE_COUNTRIES moc, MOVIE_ACTORS ma, MOVIE_DIRECTORS md,\n");
@@ -950,15 +955,7 @@ public class hw3 {
     }
 
     private void performUserQuery() {
-        uModel = new DefaultTableModel();
-        uModel = new DefaultTableModel(
-                new Object[][]{},
-                new String[]{
-                        "User ID"
-                }
-        );
-        userResultTable.setModel(uModel);
-
+        StringBuilder uquery = new StringBuilder();
     }
 
     private void performMovieQuery() {
@@ -984,22 +981,25 @@ public class hw3 {
         try {
             query = createCollectiveQuery();
             System.out.println(query);
-            result = executeQuery(query);
-            metaresult = result.getMetaData();
-            numofCol = metaresult.getColumnCount();
-            System.out.println("Fetching data from DB server ....");
-            while (result.next()) {
-                Object[] objects = new Object[numofCol + 1];
-                objects[0] = new Boolean(false);
-                for (int i = 1; i <= numofCol; i++) {
-                    objects[i] = result.getObject(i);
+            if (!query.equals(" ")) {
+                result = executeQuery(query);
+                metaresult = result.getMetaData();
+                numofCol = metaresult.getColumnCount();
+                System.out.println("Fetching data from DB server ....");
+                while (result.next()) {
+                    Object[] objects = new Object[numofCol + 1];
+                    objects[0] = Boolean.FALSE;
+                    for (int i = 1; i <= numofCol; i++) {
+                        objects[i] = result.getObject(i);
+                    }
+                    numofRow++;
+                    tModel.addRow(objects);
                 }
-                numofRow++;
-                tModel.addRow(objects);
+                if (numofRow == 1) {
+                    JOptionPane.showMessageDialog(null, "No data found in DB based on the query conditions");
+                }
             }
-            if (numofRow == 1) {
-                JOptionPane.showMessageDialog(null, "No data found in DB based on the query conditions");
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -1094,6 +1094,15 @@ public class hw3 {
                 }
         );
         queryResultTable.setModel(tModel);
+        uModel = new DefaultTableModel();
+        uModel = new DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                        "#",
+                        "User ID"
+                }
+        );
+        userResultTable.setModel(uModel);
         performLoadButton();
 
         executeMovieQueryButton.addActionListener(e -> performMovieQuery());
@@ -1107,6 +1116,15 @@ public class hw3 {
                     }
             );
             queryResultTable.setModel(tModel);
+            uModel = new DefaultTableModel();
+            uModel = new DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{
+                            "#",
+                            "User ID"
+                    }
+            );
+            userResultTable.setModel(uModel);
             //removing button colors
             castSearchButton1.setBackground(Color.white);
             castSearchButton2.setBackground(Color.white);
