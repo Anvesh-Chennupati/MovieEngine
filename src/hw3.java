@@ -920,7 +920,7 @@ public class hw3 {
         }
 
         if (sTags.size() != 0) {
-            sb.append(" and ");
+            sb.append("and ");
             sb.append("mt.TAGID in (");
             StringBuilder tempTags = new StringBuilder();
             for (int i = 0; i < sTags.size(); i++) {
@@ -930,6 +930,9 @@ public class hw3 {
             tempTags.append(")");
             sb.append(tempTags.toString());
         }
+        queryResult.append("\n");
+        queryResult.append("-----------------------------------------------------------\n");
+        queryResult.append(sb.toString());
         return sb.toString();
     }
 
@@ -1137,6 +1140,7 @@ public class hw3 {
             loadCountry();
         });
         castSearchButton1.addActionListener(e -> {
+            //to toggle button colors
             if (!(castSearchCB1.getItemCount() < 1)) {
                 selectedCast1 = Objects.requireNonNull(castSearchCB1.getSelectedItem()).toString();
                 castSearchButton1.setBackground(Color.green);
