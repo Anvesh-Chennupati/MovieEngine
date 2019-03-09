@@ -440,19 +440,9 @@ public class hw3 {
                 uniqueWeight.put(tagweight, tagweight);
             }
 
-//            System.out.println(tagid + " " + tagtext + " " + tagweight);
             if (!tagid.equals(" ") && !tagtext.equals(" ")) { // some genres don't have country
                 JCheckBox cb = new JCheckBox(tagid + " " + tagtext);
                 cb.addActionListener(e -> {
-                    /*
-                    if (searchCondition == "OR") {
-                        loadAllFilmCountry();
-                    } else if (searchCondition == "AND") {
-                        loadFilmCountry();
-                    }
-                    */
-//                        loadTags();
-
                 });
                 selectedTags.add(cb);
                 tagPanel.add(cb);
@@ -500,16 +490,13 @@ public class hw3 {
             }
             sb.append(")\n");
             queryResult.setText(sb.toString());
-            // connection DB and execute query command
             try {
-//                System.out.println(sb.toString());
                 result = executeQuery(sb.toString());
                 updateTagPanel(result);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         } else {
-//            removeCountryPanel();
             removeTagPanel();
             tagValueComboBox.removeAllItems();
         }
@@ -520,7 +507,7 @@ public class hw3 {
         while (result.next()) {
             countryPanel.setLayout(new GridLayout(0, 1));
             String text = result.getString(1);
-            if (!text.equals(" ")) { // some genres don't have country
+            if (!text.equals(" ")) {
                 JCheckBox cb = new JCheckBox(text);
                 cb.addActionListener(e -> {
                     loadTags();
@@ -598,7 +585,6 @@ public class hw3 {
 
             }
             queryResult.setText(sb.toString());
-            // connection DB and execute query command
             try {
                 result = executeQuery(sb.toString());
                 updateCountryPanel(result);
@@ -615,18 +601,14 @@ public class hw3 {
         removeCountryPanel();
         while (result.next()) {
             genrePanel.setLayout(new GridLayout(0, 1));
-//            genrePanel.setLayout(new GridLayout(0, 5, 20, 20));
             JCheckBox cb = new JCheckBox(result.getString(1));
-//            System.out.println(result.getString(1));
 
             cb.addActionListener(e -> {
 
                 loadCountry();
                 populateCast_directorCB();
             });
-            // add all queried genres JCheckbox to global variable
             selectedGenres.add(cb);
-            // update GenrePanel with genres JCheckbox
             genrePanel.add(cb);
             genrePanel.revalidate();
             genrePanel.repaint();
@@ -637,23 +619,18 @@ public class hw3 {
 
     //database connection codes
     private Connection openConnect() throws SQLException, ClassNotFoundException {
-        // Load Oracle DB driver
         DriverManager.registerDriver(new OracleDriver());
-        // hard-coded configuration to connect DB server
         String host = "localhost";
         String port = "1521";
-        String dbName = "orcl"; // Win: xe, MAC: orcl
+        String dbName = "orcl";
         String uName = "scott";
         String pWord = "scott";
 
-        // Construct JDBC URL
         String dbURL = "jdbc:oracle:thin:@" + host + ":" + port + ":" + dbName;
         return DriverManager.getConnection(dbURL, uName, pWord);
     }
 
-    /*
-     * Close the database connection
-     */
+
     private void closeConnect() {
         try {
             conn.close();
@@ -682,31 +659,11 @@ public class hw3 {
         return result;
     }
 
-    /*
-     * For debug purpose
-     */
-    private void showResultSet(ResultSet result) throws SQLException {
-        System.out.println("[DEBUG INFO]");
-        ResultSetMetaData meta = result.getMetaData();
-        //int tupleCount = 1;
-        while (result.next()) {
-            /*
-            System.out.print("Tuple " + tupleCount++ + " : ");
-            System.out.print("Tuple " + tupleCount++ + " : ");
-            */
-            for (int col = 1; col <= meta.getColumnCount(); col++) {
-
-                System.out.print("\"" + result.getString(col) + "\",");
-            }
-            System.out.println();
-        }
-    }
 
     private void populateCast_directorCB() {
         removeComboBox();
         ArrayList<String> CountrycheckList = selectCheckBox(AttrType.Countries);
         ArrayList<String> genreCheckList = selectCheckBox(AttrType.Genres);
-//        DefaultComboBoxModel<Integer> defaultComboBoxModel6 = new DefaultComboBoxModel<>();
         HashMap<String, Integer> uniqueCast = new HashMap<>();
         HashMap<String, Integer> uniqueDirector = new HashMap<>();
         ResultSet castRS;
@@ -807,7 +764,6 @@ public class hw3 {
             queryResult.append("\n");
             queryResult.append("-----------------------------------------------------------\n");
             queryResult.append(director1.toString());
-//            queryResult.setText(sb.toString());
 
             try {
                 castRS = executeQuery(cast1.toString());
@@ -839,7 +795,6 @@ public class hw3 {
                 e.printStackTrace();
             }
         } else {
-//            removeCountryPanel();
             removeComboBox();
 
         }
@@ -899,9 +854,6 @@ public class hw3 {
         boolean castset3 = castset(castSearchCB3);
         boolean castset4 = castset(castSearchCB4);
         boolean direcset = directorset(directorSearchCB);
-//        if(castSearchCB1.getItemCount()!=0 && !castSearchCB1.getSelectedItem().toString().equals("Choose Actor/Actress")){
-//            castset1 = true;
-//        }
         StringBuilder movieActor = new StringBuilder();
         movieActor.append(" ");
         if (castset1 || castset2 || castset3 || castset4) {
@@ -919,13 +871,10 @@ public class hw3 {
             sb.append(" and md.DIRECTORNAME = '" + directorSearchCB.getSelectedItem().toString() + "'\n");
         }
 
-        //adding selected tag ids
-
         if (selectedTags.size() != 0) {
 
         }
 
-        //fixing the tag panel logic when Tag panel isnt available
         if (tagValueComboBox.getItemCount() != 0) {
             System.out.println(sTags.size());
             if (!tagWeightComboBox.getSelectedItem().toString().equals("=,<,>,>=,<=")) {
@@ -973,9 +922,6 @@ public class hw3 {
             JOptionPane.showMessageDialog(null, "Please select rows from Movie Results first");
         } else {
             selectedRowsFromMovieResult = queryResultTable.getSelectedRows();
-//            for (int i1 : selectedRowsFromMovieResult) {
-//                System.out.println(i1);
-//            }
             uquery.append("select  distinct utm.USERID from USER_TAGGEDMOVIES utm \n");
             uquery.append("where utm.MOVIEID in (");
             for (int i1 : selectedRowsFromMovieResult) {
@@ -985,6 +931,9 @@ public class hw3 {
             uquery.append(")");
             System.out.println(uquery);
             ResultSet uresult;
+            queryResult.append("\n-----------------------------------------------------------\n");
+            queryResult.append(uquery.toString());
+
             uresult = executeQuery(uquery.toString());
             int numRow = 1;
             try {
@@ -1006,7 +955,6 @@ public class hw3 {
 
     private void performMovieQuery() {
 
-        //getting all the checkbox selections ,combobox selections to perform movie query
         ResultSet result;
         ResultSetMetaData metaresult;
         String query;
@@ -1021,9 +969,6 @@ public class hw3 {
                 }
         );
         queryResultTable.setModel(tModel);
-//        TableColumn tc = queryResultTable.getColumnModel().getColumn(0);
-//        tc.setCellEditor(queryResultTable.getDefaultEditor(Boolean.class));
-//        tc.setCellRenderer(queryResultTable.getDefaultRenderer(Boolean.class));
         try {
             query = createCollectiveQuery();
             System.out.println(query);
@@ -1055,30 +1000,9 @@ public class hw3 {
             closeConnect();
         }
 
-//        System.out.println("Selected Genres");
-//        for (String s : sGenre) System.out.println(s);
-//
-//        System.out.println("Selected Country");
-//        for (String s : sCountry) System.out.println(s);
-//
-//        System.out.println("Selected Tags");
-//        for (String s : sTags) System.out.println(s);
-//
-//        System.out.println("Selected Tag Weight");
-//        selectedTagWeight = Objects.requireNonNull(tagWeightComboBox.getSelectedItem()).toString();
-//        if (!selectedTagWeight.equals("=,<,>,>=,<=")) {
-//            System.out.println(selectedTagWeight);
-//        }
-//
-//        System.out.println("Selected Tag Value");
-//        if (!(tagValueComboBox.getItemCount() < 1)) {
-//            System.out.println(Objects.requireNonNull(tagValueComboBox.getSelectedItem()).toString());
-//        }
-
     }
 
     private void performLoadButton() {
-        //getting the actual start and end year from table
         String queryForStartYear = "select * from (select mov.YEAR from MOVIES mov order by mov.YEAR asc) where ROWNUM <=1";
         String queryForEndYear = "select * from (select mov.YEAR from MOVIES mov order by mov.YEAR desc) where ROWNUM <=1";
         ResultSet qfsy;
@@ -1113,11 +1037,6 @@ public class hw3 {
             String query = "SELECT DISTINCT genre\n" + "FROM movie_genres\n" + "ORDER BY genre";
             result = executeQuery(query);
             updateGenresPanel(result);
-            /*
-            query = "SELECT DISTINCT country\n" + "FROM movie_countries\n";
-            result = executeQuery(query);
-            updateCountryPanel(result);
-            */
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -1131,7 +1050,6 @@ public class hw3 {
         conn = null;
         selectedGenres = new ArrayList<>();
         selectedCountries = new ArrayList<>();
-//        selectedFilmCountries = new ArrayList<>();
         selectedTags = new ArrayList<>();
         searchCondition = "OR";
         queryCondition = "AND";
@@ -1205,9 +1123,7 @@ public class hw3 {
         });
 
         selectAndOrComboBox.addActionListener(e -> {
-            //System.out.println(selectAndOrComboBox.getSelectedItem());
             if (selectAndOrComboBox.getSelectedItem() == "AND" || selectAndOrComboBox.getSelectedItem() == "OR") {
-//                    System.out.println(selectAndOrComboBox.getSelectedItem());
                 searchCondition = selectAndOrComboBox.getSelectedItem().toString();
                 loadCountry();
             }
